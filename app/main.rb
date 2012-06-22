@@ -84,6 +84,6 @@ class Main
   end
 
   def auction_id(item_id, connection)
-    return java.lang.String.format(AUCTION_ID_FORMAT, item_id, connection.getServiceName)
+    format(AUCTION_ID_FORMAT, item_id, connection.getServiceName)
   end
 end

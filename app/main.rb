@@ -1,8 +1,3 @@
-require "java"
-
-require "smack_3_1_0.jar"
-require "smackx_3_1_0.jar"
-
 java_import org.jivesoftware.smack.MessageListener
 java_import org.jivesoftware.smack.XMPPConnection
 java_import org.jivesoftware.smack.packet.Message

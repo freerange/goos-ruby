@@ -1,5 +1,3 @@
-require "java"
-
 java_import javax.swing.JFrame
 java_import javax.swing.JLabel
 java_import javax.swing.border.LineBorder

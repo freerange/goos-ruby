@@ -1,10 +1,3 @@
-require "java"
-
-require "windowlicker-core-DEV.jar"
-require "windowlicker-swing-DEV.jar"
-require "hamcrest-core-1.2.jar"
-require "hamcrest-library-1.2.jar"
-
 java_import com.objogate.wl.swing.driver.ComponentDriver
 java_import com.objogate.wl.swing.driver.JFrameDriver
 java_import com.objogate.wl.swing.driver.JLabelDriver

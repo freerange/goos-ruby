@@ -1,11 +1,3 @@
-require "java"
-
-require "smack_3_1_0.jar"
-require "smackx_3_1_0.jar"
-require "hamcrest-core-1.2.jar"
-require "hamcrest-library-1.2.jar"
-require "junit-dep-4.6.jar"
-
 java_import org.jivesoftware.smack.XMPPConnection
 java_import org.jivesoftware.smack.ChatManagerListener
 java_import org.jivesoftware.smack.MessageListener

@@ -1,5 +1,3 @@
-require "java"
-
 java_import java.lang.Runnable
 
 require "main"

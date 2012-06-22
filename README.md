@@ -4,9 +4,10 @@ Attempt at translating GOOS book worked example into Ruby.
 
 ### Prerequisites
 
-- JRuby (tested with v1.6.7)
-- Openfire (tested with v3.7.1)
+- JRuby (tested with v1.6.7 installed via `rbenv`)
+- [Openfire](http://www.igniterealtime.org/projects/openfire/) (tested with v3.7.1)
 - Bundler (tested with v1.1.4)
+- All only tested on Mac OSX v10.7.4
 
 ### Openfire XMPP server
 
@@ -26,8 +27,12 @@ Attempt at translating GOOS book worked example into Ruby.
 
 #### Configure (via web admin console)
 
+- Login credentials
+  - Username: admin
+  - Password: admin
 - User/Groups
   - Create New User # as per "Setting Up the Openfire Server" in chapter 11
     - Username: sniper; Password: sniper
     - Username: auction-item-54321; Password: auction
     - Username: auction-item-65432; Password: auction
+

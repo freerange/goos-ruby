@@ -7,14 +7,15 @@ require "hamcrest-library-1.2.jar"
 require "junit-dep-4.6.jar"
 
 java_import org.jivesoftware.smack.XMPPConnection
-java_import java.util.concurrent.ArrayBlockingQueue
 java_import org.jivesoftware.smack.ChatManagerListener
+java_import org.jivesoftware.smack.MessageListener
 java_import org.jivesoftware.smack.packet.Message
+
+java_import java.util.concurrent.ArrayBlockingQueue
 java_import java.util.concurrent.TimeUnit
+
 java_import org.hamcrest.Matchers
 java_import org.hamcrest.core.Is
-java_import org.junit.Assert
-java_import org.jivesoftware.smack.MessageListener
 
 class SingleMessageListener
   include MessageListener

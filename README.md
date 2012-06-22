@@ -27,12 +27,17 @@ Attempt at translating GOOS book worked example into Ruby.
 
 #### Configure (via web admin console)
 
+As per "Setting Up the Openfire Server" in chapter 11
+
 - Login credentials
   - Username: admin
   - Password: admin
 - User/Groups
-  - Create New User # as per "Setting Up the Openfire Server" in chapter 11
+  - Create New User x 3
     - Username: sniper; Password: sniper
     - Username: auction-item-54321; Password: auction
     - Username: auction-item-65432; Password: auction
-
+- Server
+  - Server Settings
+    - Resource Policy
+      - Set Conflict Policy: Never kick (non-default)

@@ -11,6 +11,8 @@ Attempt at translating GOOS book worked example into Ruby.
 
 ### Openfire XMPP server
 
+Setup & configuration as per "Setting Up the Openfire Server" in chapter 11.
+
 #### Setup (via web wizard)
 
 - Language Selection: English (default)
@@ -26,8 +28,6 @@ Attempt at translating GOOS book worked example into Ruby.
   - Confirm password: admin
 
 #### Configure (via web admin console)
-
-As per "Setting Up the Openfire Server" in chapter 11
 
 - Login credentials
   - Username: admin

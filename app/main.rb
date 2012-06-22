@@ -1,3 +1,5 @@
+require "env"
+
 java_import org.jivesoftware.smack.MessageListener
 java_import org.jivesoftware.smack.XMPPConnection
 java_import org.jivesoftware.smack.packet.Message

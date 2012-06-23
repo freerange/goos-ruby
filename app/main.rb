@@ -5,7 +5,6 @@ java_import org.jivesoftware.smack.XMPPConnection
 java_import org.jivesoftware.smack.packet.Message
 
 java_import javax.swing.SwingUtilities
-java_import java.lang.Runnable
 
 require "ui/main_window"
 
@@ -19,8 +18,6 @@ class Main
   ITEM_ID_AS_LOGIN = "auction-%s"
   AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE
 
-  attr_accessor :ui
-
   def initialize
     start_user_interface
   end
@@ -31,16 +28,11 @@ class Main
   end
 
   def join_auction(connection, item_id)
-    chat = connection.getChatManager.createChat(
-      auction_id(item_id, connection),
-      implement(MessageListener, processMessage: -> aChat, message {
-        SwingUtilities.invokeLater(
-          implement(Runnable, run: -> {
-            context.ui.show_status(MainWindow::STATUS_LOST)
-          })
-        )
-      })
-    )
+    chat = connection.getChatManager.createChat(auction_id(item_id, connection)) do |aChat, message|
+      SwingUtilities.invokeLater do
+        @ui.show_status(MainWindow::STATUS_LOST)
+      end
+    end
     @not_to_be_garbage_collected = chat
     chat.sendMessage(Message.new)
   end
@@ -55,11 +47,9 @@ class Main
   private
 
   def start_user_interface
-    SwingUtilities.invokeAndWait(
-      implement(Runnable, run: -> {
-        context.ui = MainWindow.new
-      })
-    )
+    SwingUtilities.invokeAndWait do
+      @ui = MainWindow.new
+    end
   end
 
   def auction_id(item_id, connection)

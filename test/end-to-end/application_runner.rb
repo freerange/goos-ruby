@@ -1,5 +1,3 @@
-java_import java.lang.Runnable
-
 require "main"
 require "end-to-end/fake_auction_server"
 require "end-to-end/auction_sniper_driver"
@@ -9,15 +7,14 @@ class ApplicationRunner
   SNIPER_PASSWORD = "sniper"
 
   def start_bidding_in(auction)
-    thread = java.lang.Thread.new(
-      implement(Runnable, run: -> {
-        begin
-          Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.item_id)
-        rescue => e
-          p e
-        end
-      }), "Test Application"
-    )
+    thread = java.lang.Thread.new do
+      begin
+        Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.item_id)
+      rescue => e
+        p e
+      end
+    end
+    thread.setName("Test Application")
     thread.setDaemon(true)
     thread.start
     @driver = AuctionSniperDriver.new(1000)

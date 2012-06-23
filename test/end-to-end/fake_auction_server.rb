@@ -32,8 +32,7 @@ class FakeAuctionServer
   XMPP_HOSTNAME = "localhost"
   AUCTION_PASSWORD = "auction"
 
-  attr_reader :item_id, :message_listener
-  attr_writer :current_chat
+  attr_reader :item_id
 
   def initialize(item_id)
     @item_id = item_id
@@ -43,15 +42,11 @@ class FakeAuctionServer
 
   def start_selling_item
     @connection.connect
-    @connection.login(format(ITEM_ID_AS_LOGIN, item_id), AUCTION_PASSWORD, AUCTION_RESOURCE)
-    @connection.getChatManager.addChatListener(
-      implement(ChatManagerListener,
-        chatCreated: -> chat, createdLocally {
-          context.current_chat = chat
-          chat.addMessageListener(context.message_listener)
-        }
-      )
-    )
+    @connection.login(format(ITEM_ID_AS_LOGIN, @item_id), AUCTION_PASSWORD, AUCTION_RESOURCE)
+    @connection.getChatManager.addChatListener do |chat, createdLocally|
+      @current_chat = chat
+      chat.addMessageListener(@message_listener)
+    end
   end
 
   def has_received_join_request_from_sniper

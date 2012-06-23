@@ -33,25 +33,13 @@ class Main
   def join_auction(connection, item_id)
     chat = connection.getChatManager.createChat(
       auction_id(item_id, connection),
-      Class.new do
-        include MessageListener
-        def initialize(main)
-          @main = main
-        end
-        def processMessage(aChat, message)
-          SwingUtilities.invokeLater(
-            Class.new do
-              include Runnable
-              def initialize(main)
-                @main = main
-              end
-              def run
-                @main.ui.show_status(MainWindow::STATUS_LOST)
-              end
-            end.new(@main)
-          )
-        end
-      end.new(self)
+      implement(MessageListener, processMessage: -> aChat, message {
+        SwingUtilities.invokeLater(
+          implement(Runnable, run: -> {
+            context.ui.show_status(MainWindow::STATUS_LOST)
+          })
+        )
+      })
     )
     @not_to_be_garbage_collected = chat
     chat.sendMessage(Message.new)
@@ -68,15 +56,9 @@ class Main
 
   def start_user_interface
     SwingUtilities.invokeAndWait(
-      Class.new do
-        include Runnable
-        def initialize(main)
-          @main = main
-        end
-        def run
-          @main.ui = MainWindow.new
-        end
-      end.new(self)
+      implement(Runnable, run: -> {
+        context.ui = MainWindow.new
+      })
     )
   end
 

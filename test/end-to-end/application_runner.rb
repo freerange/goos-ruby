@@ -10,18 +10,13 @@ class ApplicationRunner
 
   def start_bidding_in(auction)
     thread = java.lang.Thread.new(
-      Class.new do
-        include Runnable
-        def initialize(auction)
-          @auction = auction
-        end
-        def run
-          Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, @auction.item_id)
+      implement(Runnable, run: -> {
+        begin
+          Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.item_id)
         rescue => e
           p e
         end
-      end.new(auction),
-      "Test Application"
+      }), "Test Application"
     )
     thread.setDaemon(true)
     thread.start

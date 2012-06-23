@@ -45,16 +45,12 @@ class FakeAuctionServer
     @connection.connect
     @connection.login(format(ITEM_ID_AS_LOGIN, item_id), AUCTION_PASSWORD, AUCTION_RESOURCE)
     @connection.getChatManager.addChatListener(
-      Class.new do
-        include ChatManagerListener
-        def initialize(auction_server)
-          @auction_server = auction_server
-        end
-        def chatCreated(chat, createdLocally)
-          @auction_server.current_chat = chat
-          chat.addMessageListener(@auction_server.message_listener)
-        end
-      end.new(self)
+      implement(ChatManagerListener,
+        chatCreated: -> chat, createdLocally {
+          context.current_chat = chat
+          chat.addMessageListener(context.message_listener)
+        }
+      )
     )
   end
 

@@ -7,6 +7,7 @@ java_import org.jivesoftware.smack.packet.Message
 java_import javax.swing.SwingUtilities
 
 require "ui/main_window"
+require "auction_message_translator"
 
 class Main
   ARG_HOSTNAME = 0
@@ -32,13 +33,18 @@ class Main
 
   def join_auction(connection, item_id)
     disconnect_when_ui_closes(connection)
-    chat = connection.getChatManager.createChat(auction_id(item_id, connection)) do |aChat, message|
-      SwingUtilities.invokeLater do
-        @ui.show_status(MainWindow::STATUS_LOST)
-      end
-    end
+    chat = connection.getChatManager.createChat(
+      auction_id(item_id, connection),
+      AuctionMessageTranslator.new(self)
+    )
     @not_to_be_garbage_collected = chat
     chat.sendMessage(JOIN_COMMAND_FORMAT)
+  end
+
+  def auction_closed
+    SwingUtilities.invokeLater do
+      @ui.show_status(MainWindow::STATUS_LOST)
+    end
   end
 
   def self.connection(hostname, username, password)

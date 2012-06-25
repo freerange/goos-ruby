@@ -52,7 +52,7 @@ class FakeAuctionServer
   end
 
   def report_price(price, increment, bidder)
-    @current_chat.sendMessage(format("SOLVersion: 1.1; Event: PRICE; CurrentPrice: %d; Increment: %d; Bidder: %s;", price, increment, bidder))
+    @current_chat.sendMessage(format("SQLVersion: 1.1; Event: PRICE; CurrentPrice: %d; Increment: %d; Bidder: %s;", price, increment, bidder))
   end
 
   def has_received_join_request_from(sniper_id)
@@ -64,7 +64,7 @@ class FakeAuctionServer
   end
 
   def announce_closed
-    @current_chat.sendMessage("SOLVersion: 1.1; Event: CLOSE;");
+    @current_chat.sendMessage("SQLVersion: 1.1; Event: CLOSE;");
   end
 
   def stop

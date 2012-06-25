@@ -19,8 +19,8 @@ class Main
   ITEM_ID_AS_LOGIN = "auction-%s"
   AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE
 
-  JOIN_COMMAND_FORMAT = "SOLVersion: 1.1; Command: JOIN;"
-  BID_COMMAND_FORMAT = "SOLVersion: 1.1; Command: BID; Price: %d;"
+  JOIN_COMMAND_FORMAT = "SQLVersion: 1.1; Command: JOIN;"
+  BID_COMMAND_FORMAT = "SQLVersion: 1.1; Command: BID; Price: %d;"
 
   def initialize
     start_user_interface

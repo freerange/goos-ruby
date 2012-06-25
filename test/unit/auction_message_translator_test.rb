@@ -17,7 +17,7 @@ describe AuctionMessageTranslator do
     @listener.expects(:auction_closed)
 
     message = Message.new
-    message.setBody("SOLVersion: 1.1; Event: CLOSE;")
+    message.setBody("SQLVersion: 1.1; Event: CLOSE;")
     @translator.processMessage(UNUSED_CHAT, message)
   end
 
@@ -25,7 +25,7 @@ describe AuctionMessageTranslator do
     @listener.expects(:current_price).with(192, 7)
 
     message = Message.new
-    message.setBody("SOLVersion: 1.1; Event: PRICE; CurrentPrice: 192; Increment: 7; Bidder: Someone else;" )
+    message.setBody("SQLVersion: 1.1; Event: PRICE; CurrentPrice: 192; Increment: 7; Bidder: Someone else;" )
     @translator.processMessage(UNUSED_CHAT, message)
   end
 end

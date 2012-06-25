@@ -1,6 +1,8 @@
 require "minitest/spec"
 require "minitest/autorun"
 
+require "mocha"
+
 require "java"
 
 $CLASSPATH << File.expand_path("../../lib/develop", __FILE__)

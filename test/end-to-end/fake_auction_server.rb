@@ -64,7 +64,7 @@ class FakeAuctionServer
   end
 
   def announce_closed
-    @current_chat.sendMessage(Message.new)
+    @current_chat.sendMessage("SOLVersion: 1.1; Event: CLOSE;");
   end
 
   def stop

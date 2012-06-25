@@ -1,6 +1,11 @@
 class AuctionSniper
-  def initialize(sniper_listener)
-    @sniper_listener = sniper_listener
+  def initialize(auction, sniper_listener)
+    @auction, @sniper_listener = auction, sniper_listener
+  end
+
+  def current_price(price, increment)
+    @auction.bid(price + increment)
+    @sniper_listener.sniper_bidding
   end
 
   def auction_closed

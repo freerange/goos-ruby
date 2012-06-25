@@ -8,6 +8,7 @@ java_import javax.swing.SwingUtilities
 
 require "ui/main_window"
 require "auction_message_translator"
+require "auction_sniper"
 
 class Main
   ARG_HOSTNAME = 0
@@ -35,13 +36,13 @@ class Main
     disconnect_when_ui_closes(connection)
     chat = connection.getChatManager.createChat(
       auction_id(item_id, connection),
-      AuctionMessageTranslator.new(self)
+      AuctionMessageTranslator.new(AuctionSniper.new(self))
     )
     @not_to_be_garbage_collected = chat
     chat.sendMessage(JOIN_COMMAND_FORMAT)
   end
 
-  def auction_closed
+  def sniper_lost
     SwingUtilities.invokeLater do
       @ui.show_status(MainWindow::STATUS_LOST)
     end

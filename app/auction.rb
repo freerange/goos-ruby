@@ -1,2 +1,0 @@
-class Auction
-end

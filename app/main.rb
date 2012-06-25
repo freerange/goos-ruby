@@ -9,7 +9,7 @@ java_import javax.swing.SwingUtilities
 require "ui/main_window"
 require "auction_message_translator"
 require "auction_sniper"
-require "auction"
+require "xmpp_auction"
 
 class Main
   ARG_HOSTNAME = 0
@@ -20,9 +20,6 @@ class Main
   AUCTION_RESOURCE = "Auction"
   ITEM_ID_AS_LOGIN = "auction-%s"
   AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE
-
-  JOIN_COMMAND_FORMAT = "SQLVersion: 1.1; Command: JOIN;"
-  BID_COMMAND_FORMAT = "SQLVersion: 1.1; Command: BID; Price: %d;"
 
   def initialize
     start_user_interface
@@ -39,18 +36,9 @@ class Main
     chat = connection.getChatManager.createChat(auction_id(item_id, connection), nil)
     @not_to_be_garbage_collected = chat
 
-    auction = Class.new(Auction) do
-      define_method(:bid) do |amount|
-        begin
-          chat.sendMessage(format(BID_COMMAND_FORMAT, amount))
-        rescue XMPPException => e
-          puts %{\n#{e}\n#{e.backtrace.join("\n")}}
-        end
-      end
-    end.new
-
+    auction = XMPPAuction.new(chat)
     chat.addMessageListener(AuctionMessageTranslator.new(AuctionSniper.new(auction, self)))
-    chat.sendMessage(JOIN_COMMAND_FORMAT)
+    auction.join
   end
 
   def sniper_bidding

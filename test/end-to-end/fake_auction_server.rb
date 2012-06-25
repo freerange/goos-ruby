@@ -9,6 +9,8 @@ java_import java.util.concurrent.TimeUnit
 java_import org.junit.Assert
 java_import org.hamcrest.Matchers
 
+require "xmpp_auction"
+
 class SingleMessageListener
   include MessageListener
   include MiniTest::Assertions
@@ -56,11 +58,11 @@ class FakeAuctionServer
   end
 
   def has_received_join_request_from(sniper_id)
-    receives_a_message_matching(sniper_id, Matchers.equalTo(Main::JOIN_COMMAND_FORMAT))
+    receives_a_message_matching(sniper_id, Matchers.equalTo(XMPPAuction::JOIN_COMMAND_FORMAT))
   end
 
   def has_received_bid(bid, sniper_id)
-    receives_a_message_matching(sniper_id, Matchers.equalTo(format(Main::BID_COMMAND_FORMAT, bid)))
+    receives_a_message_matching(sniper_id, Matchers.equalTo(format(XMPPAuction::BID_COMMAND_FORMAT, bid)))
   end
 
   def announce_closed

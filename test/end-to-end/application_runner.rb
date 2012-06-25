@@ -11,7 +11,7 @@ class ApplicationRunner
       begin
         Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.item_id)
       rescue => e
-        p e
+        puts %{\n#{e}\n#{e.backtrace.join("\n")}}
       end
     end
     thread.setName("Test Application")

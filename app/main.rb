@@ -9,6 +9,7 @@ java_import javax.swing.SwingUtilities
 require "ui/main_window"
 require "auction_message_translator"
 require "auction_sniper"
+require "auction"
 
 class Main
   ARG_HOSTNAME = 0
@@ -34,12 +35,28 @@ class Main
 
   def join_auction(connection, item_id)
     disconnect_when_ui_closes(connection)
-    chat = connection.getChatManager.createChat(
-      auction_id(item_id, connection),
-      AuctionMessageTranslator.new(AuctionSniper.new(self))
-    )
+
+    chat = connection.getChatManager.createChat(auction_id(item_id, connection), nil)
     @not_to_be_garbage_collected = chat
+
+    auction = Class.new(Auction) do
+      define_method(:bid) do |amount|
+        begin
+          chat.sendMessage(format(BID_COMMAND_FORMAT, amount))
+        rescue XMPPException => e
+          puts %{\n#{e}\n#{e.backtrace.join("\n")}}
+        end
+      end
+    end.new
+
+    chat.addMessageListener(AuctionMessageTranslator.new(AuctionSniper.new(auction, self)))
     chat.sendMessage(JOIN_COMMAND_FORMAT)
+  end
+
+  def sniper_bidding
+    SwingUtilities.invokeLater do
+      @ui.show_status(MainWindow::STATUS_BIDDING)
+    end
   end
 
   def sniper_lost

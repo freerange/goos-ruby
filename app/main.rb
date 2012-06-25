@@ -18,6 +18,9 @@ class Main
   ITEM_ID_AS_LOGIN = "auction-%s"
   AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE
 
+  JOIN_COMMAND_FORMAT = "SOLVersion: 1.1; Command: JOIN;"
+  BID_COMMAND_FORMAT = "SOLVersion: 1.1; Command: BID; Price: %d;"
+
   def initialize
     start_user_interface
   end
@@ -34,7 +37,7 @@ class Main
       end
     end
     @not_to_be_garbage_collected = chat
-    chat.sendMessage(Message.new)
+    chat.sendMessage(JOIN_COMMAND_FORMAT)
   end
 
   def self.connection(hostname, username, password)

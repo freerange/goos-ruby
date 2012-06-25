@@ -9,6 +9,7 @@ class MainWindow < JFrame
   SNIPER_STATUS_NAME = "sniper status"
 
   STATUS_JOINING = "joining"
+  STATUS_BIDDING = "bidding"
   STATUS_LOST = "lost"
 
   def initialize

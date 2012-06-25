@@ -5,6 +5,7 @@ require "end-to-end/auction_sniper_driver"
 class ApplicationRunner
   SNIPER_ID = "sniper"
   SNIPER_PASSWORD = "sniper"
+  SNIPER_XMPP_ID = SNIPER_ID + "@" + FakeAuctionServer::XMPP_HOSTNAME + "/Auction"
 
   def start_bidding_in(auction)
     thread = Thread.new do
@@ -16,6 +17,10 @@ class ApplicationRunner
     end
     @driver = AuctionSniperDriver.new(1000)
     @driver.shows_sniper_status(MainWindow::STATUS_JOINING)
+  end
+
+  def has_shown_sniper_is_bidding
+    @driver.shows_sniper_status(MainWindow::STATUS_BIDDING)
   end
 
   def shows_sniper_has_lost_auction

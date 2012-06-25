@@ -21,6 +21,28 @@ class Main
   ITEM_ID_AS_LOGIN = "auction-%s"
   AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE
 
+  class SniperStateDisplayer
+    def initialize(ui)
+      @ui = ui
+    end
+
+    def sniper_bidding
+      show_status(MainWindow::STATUS_BIDDING)
+    end
+
+    def sniper_lost
+      show_status(MainWindow::STATUS_LOST)
+    end
+
+    private
+
+    def show_status(status)
+      SwingUtilities.invokeLater do
+        @ui.show_status(status)
+      end
+    end
+  end
+
   def initialize
     start_user_interface
   end
@@ -37,20 +59,12 @@ class Main
     @not_to_be_garbage_collected = chat
 
     auction = XMPPAuction.new(chat)
-    chat.addMessageListener(AuctionMessageTranslator.new(AuctionSniper.new(auction, self)))
+    chat.addMessageListener(
+      AuctionMessageTranslator.new(
+        AuctionSniper.new(auction, SniperStateDisplayer.new(@ui))
+      )
+    )
     auction.join
-  end
-
-  def sniper_bidding
-    SwingUtilities.invokeLater do
-      @ui.show_status(MainWindow::STATUS_BIDDING)
-    end
-  end
-
-  def sniper_lost
-    SwingUtilities.invokeLater do
-      @ui.show_status(MainWindow::STATUS_LOST)
-    end
   end
 
   def self.connection(hostname, username, password)

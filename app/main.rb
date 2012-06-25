@@ -31,6 +31,7 @@ class Main
   end
 
   def join_auction(connection, item_id)
+    disconnect_when_ui_closes(connection)
     chat = connection.getChatManager.createChat(auction_id(item_id, connection)) do |aChat, message|
       SwingUtilities.invokeLater do
         @ui.show_status(MainWindow::STATUS_LOST)
@@ -57,5 +58,13 @@ class Main
 
   def auction_id(item_id, connection)
     format(AUCTION_ID_FORMAT, item_id, connection.getServiceName)
+  end
+
+  def disconnect_when_ui_closes(connection)
+    @ui.addWindowListener do |event|
+      if event.paramString[/WINDOW_CLOSED/]
+        connection.disconnect
+      end
+    end
   end
 end

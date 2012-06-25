@@ -6,8 +6,8 @@ java_import org.jivesoftware.smack.packet.Message
 java_import java.util.concurrent.ArrayBlockingQueue
 java_import java.util.concurrent.TimeUnit
 
+java_import org.junit.Assert
 java_import org.hamcrest.Matchers
-java_import org.hamcrest.core.Is
 
 class SingleMessageListener
   include MessageListener
@@ -21,8 +21,10 @@ class SingleMessageListener
     @messages.add(message)
   end
 
-  def receives_a_message
-    refute_nil @messages.poll(5, TimeUnit::SECONDS)
+  def receives_a_message(message_matcher)
+    message = @messages.poll(5, TimeUnit::SECONDS)
+    Assert.assertThat("Message", message, Matchers.is(Matchers.notNullValue()))
+    Assert.assertThat(message.getBody, message_matcher)
   end
 end
 
@@ -49,8 +51,16 @@ class FakeAuctionServer
     end
   end
 
-  def has_received_join_request_from_sniper
-    @message_listener.receives_a_message
+  def report_price(price, increment, bidder)
+    @current_chat.sendMessage(format("SOLVersion: 1.1; Event: PRICE; CurrentPrice: %d; Increment: %d; Bidder: %s;", price, increment, bidder))
+  end
+
+  def has_received_join_request_from(sniper_id)
+    receives_a_message_matching(sniper_id, Matchers.equalTo(Main::JOIN_COMMAND_FORMAT))
+  end
+
+  def has_received_bid(bid, sniper_id)
+    receives_a_message_matching(sniper_id, Matchers.equalTo(format(Main::BID_COMMAND_FORMAT, bid)))
   end
 
   def announce_closed
@@ -59,5 +69,12 @@ class FakeAuctionServer
 
   def stop
     @connection.disconnect
+  end
+
+  private
+
+  def receives_a_message_matching(sniper_id, message_matcher)
+    @message_listener.receives_a_message(message_matcher)
+    Assert.assertThat(@current_chat.getParticipant, Matchers.equalTo(sniper_id));
   end
 end

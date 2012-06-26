@@ -26,7 +26,7 @@ class Main
       @ui = ui
     end
 
-    def sniper_bidding
+    def sniper_bidding(state)
       show_status(MainWindow::STATUS_BIDDING)
     end
 
@@ -70,7 +70,7 @@ class Main
     chat.addMessageListener(
       AuctionMessageTranslator.new(
         connection.getUser,
-        AuctionSniper.new(auction, SniperStateDisplayer.new(@ui))
+        AuctionSniper.new(item_id, auction, SniperStateDisplayer.new(@ui))
       )
     )
     auction.join

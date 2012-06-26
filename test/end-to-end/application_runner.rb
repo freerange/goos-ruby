@@ -30,6 +30,14 @@ class ApplicationRunner
     @driver.shows_sniper_status(MainWindow::STATUS_LOST)
   end
 
+  def has_shown_sniper_is_winning
+    @driver.shows_sniper_status(MainWindow::STATUS_WINNING)
+  end
+
+  def shows_sniper_has_won_auction
+    @driver.shows_sniper_status(MainWindow::STATUS_WON)
+  end
+
   def stop
     unless @driver.nil?
       @driver.dispose

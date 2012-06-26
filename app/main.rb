@@ -30,6 +30,9 @@ class Main
       show_status(MainWindow::STATUS_BIDDING)
     end
 
+    def sniper_winning
+    end
+
     def sniper_lost
       show_status(MainWindow::STATUS_LOST)
     end
@@ -61,6 +64,7 @@ class Main
     auction = XMPPAuction.new(chat)
     chat.addMessageListener(
       AuctionMessageTranslator.new(
+        connection.getUser,
         AuctionSniper.new(auction, SniperStateDisplayer.new(@ui))
       )
     )

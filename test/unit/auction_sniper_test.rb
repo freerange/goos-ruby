@@ -2,12 +2,15 @@ require "test_helper"
 
 require "auction_sniper"
 require "price_source"
+require "sniper_state"
 
 describe AuctionSniper do
+  ITEM_ID = "item-id"
+
   before do
     @auction = mock("Auction")
     @sniper_listener = mock("SniperListener")
-    @sniper = AuctionSniper.new(@auction, @sniper_listener)
+    @sniper = AuctionSniper.new(ITEM_ID, @auction, @sniper_listener)
     @sniper_state = states("sniper")
   end
 
@@ -18,7 +21,7 @@ describe AuctionSniper do
 
   it "reports lost if auction closes when bidding" do
     @auction.stub_everything
-    @sniper_listener.stubs(:sniper_bidding).then(@sniper_state.is("bidding"))
+    @sniper_listener.stubs(:sniper_bidding).with(instance_of(SniperState)).then(@sniper_state.is("bidding"))
     @sniper_listener.expects(:sniper_lost).at_least_once.when(@sniper_state.is("bidding"))
 
     @sniper.current_price(123, 45, PriceSource::FROM_OTHER_BIDDER)
@@ -37,8 +40,9 @@ describe AuctionSniper do
   it "bids higher and reports bidding when new price arrives" do
     price = 1001
     increment = 25
-    @auction.expects(:bid).with(price + increment)
-    @sniper_listener.expects(:sniper_bidding).at_least_once
+    bid = price + increment
+    @auction.expects(:bid).with(bid)
+    @sniper_listener.expects(:sniper_bidding).with(SniperState.new(ITEM_ID, price, bid)).at_least_once
     @sniper.current_price(price, increment, PriceSource::FROM_OTHER_BIDDER)
   end
 

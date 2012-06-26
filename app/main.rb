@@ -34,6 +34,10 @@ class Main
       show_status(MainWindow::STATUS_WINNING)
     end
 
+    def sniper_won
+      show_status(MainWindow::STATUS_WON)
+    end
+
     def sniper_lost
       show_status(MainWindow::STATUS_LOST)
     end

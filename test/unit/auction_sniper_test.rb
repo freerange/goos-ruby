@@ -8,10 +8,29 @@ describe AuctionSniper do
     @auction = mock("Auction")
     @sniper_listener = mock("SniperListener")
     @sniper = AuctionSniper.new(@auction, @sniper_listener)
+    @sniper_state = states("sniper")
   end
 
-  it "reports lost when auction closes" do
+  it "reports lost when auction closes immediately" do
     @sniper_listener.expects(:sniper_lost).at_least_once
+    @sniper.auction_closed
+  end
+
+  it "reports lost if auction closes when bidding" do
+    @auction.stub_everything
+    @sniper_listener.stubs(:sniper_bidding).then(@sniper_state.is("bidding"))
+    @sniper_listener.expects(:sniper_lost).at_least_once.when(@sniper_state.is("bidding"))
+
+    @sniper.current_price(123, 45, PriceSource::FROM_OTHER_BIDDER)
+    @sniper.auction_closed
+  end
+
+  it "reports won if auction closes when winning" do
+    @auction.stub_everything
+    @sniper_listener.stubs(:sniper_winning).then(@sniper_state.is("winning"))
+    @sniper_listener.expects(:sniper_won).at_least_once.when(@sniper_state.is("winning"))
+
+    @sniper.current_price(123, 45, PriceSource::FROM_SNIPER)
     @sniper.auction_closed
   end
 

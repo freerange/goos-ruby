@@ -6,8 +6,6 @@ java_import com.objogate.wl.swing.AWTEventQueueProber
 java_import com.objogate.wl.swing.matcher.JLabelTextMatcher
 java_import com.objogate.wl.swing.matcher.IterableComponentsMatcher
 
-java_import org.hamcrest.Matchers
-
 require "ui/main_window"
 require "main"
 
@@ -26,14 +24,14 @@ class AuctionSniperDriver < JFrameDriver
   def shows_sniper_status_text(status_text)
     JTableDriver.new(
       self,
-      Matchers.anything
+      ComponentDriver.named(MainWindow::SNIPERS_TABLE_NAME)
     ).hasCell(JLabelTextMatcher.withLabelText(Matchers.equalTo(status_text)))
   end
 
   def shows_sniper_status(item_id, last_price, last_bid, status_text)
     JTableDriver.new(
       self,
-      Matchers.anything
+      ComponentDriver.named(MainWindow::SNIPERS_TABLE_NAME)
     ).hasRow(IterableComponentsMatcher.matching(
       JLabelTextMatcher.withLabelText(item_id),
       JLabelTextMatcher.withLabelText(last_price.to_s),

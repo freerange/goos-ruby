@@ -8,31 +8,32 @@ class ApplicationRunner
   SNIPER_XMPP_ID = SNIPER_ID + "@" + FakeAuctionServer::XMPP_HOSTNAME + "/Auction"
 
   def start_bidding_in(auction)
+    @item_id = auction.item_id
     thread = Thread.new do
       begin
-        Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.item_id)
+        Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, @item_id)
       rescue => e
         puts %{\n#{e}\n#{e.backtrace.join("\n")}}
       end
     end
     @driver = AuctionSniperDriver.new(1000)
-    @driver.shows_sniper_status(MainWindow::STATUS_JOINING)
+    @driver.shows_sniper_status_text(MainWindow::STATUS_JOINING)
   end
 
-  def has_shown_sniper_is_bidding
-    @driver.shows_sniper_status(MainWindow::STATUS_BIDDING)
+  def has_shown_sniper_is_bidding(last_price, last_bid)
+    @driver.shows_sniper_status(@item_id, last_price, last_bid, MainWindow::STATUS_BIDDING)
   end
 
   def shows_sniper_has_lost_auction
-    @driver.shows_sniper_status(MainWindow::STATUS_LOST)
+    @driver.shows_sniper_status_text(MainWindow::STATUS_LOST)
   end
 
-  def has_shown_sniper_is_winning
-    @driver.shows_sniper_status(MainWindow::STATUS_WINNING)
+  def has_shown_sniper_is_winning(winning_bid)
+    @driver.shows_sniper_status(@item_id, winning_bid, winning_bid, MainWindow::STATUS_WINNING)
   end
 
-  def shows_sniper_has_won_auction
-    @driver.shows_sniper_status(MainWindow::STATUS_WON)
+  def shows_sniper_has_won_auction(last_price)
+    @driver.shows_sniper_status(@item_id, last_price, last_price, MainWindow::STATUS_WON)
   end
 
   def stop

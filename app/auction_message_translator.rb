@@ -1,3 +1,5 @@
+require "price_source"
+
 class AuctionMessageTranslator
 
   class AuctionEvent
@@ -30,6 +32,16 @@ class AuctionMessageTranslator
       @fields.store(pair[0].strip, pair[1].strip)
     end
 
+    def is_from(sniper_id)
+      return (sniper_id == bidder) ? PriceSource::FROM_SNIPER : PriceSource::FROM_OTHER_BIDDER
+    end
+
+    private
+
+    def bidder
+      return get("Bidder")
+    end
+
     class << self
       def from(message_body)
         event = AuctionEvent.new
@@ -45,8 +57,8 @@ class AuctionMessageTranslator
     end
   end
 
-  def initialize(listener)
-    @listener = listener
+  def initialize(sniper_id, listener)
+    @sniper_id, @listener = sniper_id, listener
   end
 
   def processMessage(chat, message)
@@ -55,7 +67,7 @@ class AuctionMessageTranslator
     if "CLOSE" == event_type
       @listener.auction_closed
     elsif "PRICE" == event_type
-      @listener.current_price(event.current_price, event.increment)
+      @listener.current_price(event.current_price, event.increment, event.is_from(@sniper_id))
     end
   end
 end

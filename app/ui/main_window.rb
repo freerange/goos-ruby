@@ -8,7 +8,7 @@ java_import java.awt.Color
 java_import java.awt.BorderLayout
 
 require "ui/column"
-require "sniper_state"
+require "sniper_snapshot"
 
 class MainWindow < JFrame
 
@@ -24,12 +24,12 @@ class MainWindow < JFrame
   STATUS_LOST = "lost"
 
   class SnipersTableModel < AbstractTableModel
-    STARTING_UP = SniperState.new("", 0, 0)
+    STARTING_UP = SniperSnapshot.new("", 0, 0)
 
     def initialize
       super
       @status_text = STATUS_JOINING
-      @sniper_state = STARTING_UP
+      @sniper_snapshot = STARTING_UP
     end
 
     def getColumnCount
@@ -43,12 +43,12 @@ class MainWindow < JFrame
     def getValueAt(row_index, column_index)
       case Column.at(column_index)
       when Column::ITEM_IDENTIFIER
-        return @sniper_state.item_id
+        return @sniper_snapshot.item_id
       when Column::LAST_PRICE
-        return @sniper_state.last_price
+        return @sniper_snapshot.last_price
       when Column::LAST_BID
-        return @sniper_state.last_bid
-      when Column::SNIPER_STATUS
+        return @sniper_snapshot.last_bid
+      when Column::SNIPER_STATE
         return @status_text
       else
         raise new ArgumentError("No column at " + column_index)
@@ -60,8 +60,8 @@ class MainWindow < JFrame
       fireTableRowsUpdated(0, 0)
     end
 
-    def sniper_status_changed(new_sniper_state, new_status_text)
-      @sniper_state = new_sniper_state
+    def sniper_status_changed(new_sniper_snapshot, new_status_text)
+      @sniper_snapshot = new_sniper_snapshot
       @status_text = new_status_text
       fireTableRowsUpdated(0, 0)
     end
@@ -83,8 +83,8 @@ class MainWindow < JFrame
     @snipers.set_status_text(status_text)
   end
 
-  def sniper_status_changed(sniper_state, status_text)
-    @snipers.sniper_status_changed(sniper_state, status_text)
+  def sniper_status_changed(sniper_snapshot, status_text)
+    @snipers.sniper_status_changed(sniper_snapshot, status_text)
   end
 
   private

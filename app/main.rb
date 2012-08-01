@@ -27,7 +27,9 @@ class Main
     end
 
     def sniper_bidding(state)
-      show_status(MainWindow::STATUS_BIDDING)
+      SwingUtilities.invokeLater do
+        @ui.sniper_status_changed(state, MainWindow::STATUS_BIDDING)
+      end
     end
 
     def sniper_winning

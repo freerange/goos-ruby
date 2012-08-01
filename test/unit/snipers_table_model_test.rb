@@ -2,7 +2,7 @@ require "test_helper"
 
 require "ui/main_window"
 require "ui/column"
-require "sniper_state"
+require "sniper_snapshot"
 
 java_import javax.swing.event.TableModelEvent
 
@@ -26,11 +26,11 @@ describe MainWindow::SnipersTableModel do
       matches &&= (actual.getLastRow == expected.getLastRow)
       matches
     end
-    @model.sniper_status_changed(SniperState.new("item id", 555, 666), MainWindow::STATUS_BIDDING)
+    @model.sniper_status_changed(SniperSnapshot.new("item id", 555, 666), MainWindow::STATUS_BIDDING)
     assert_column_equals(Column::ITEM_IDENTIFIER, "item id")
     assert_column_equals(Column::LAST_PRICE, 555)
     assert_column_equals(Column::LAST_BID, 666)
-    assert_column_equals(Column::SNIPER_STATUS, MainWindow::STATUS_BIDDING)
+    assert_column_equals(Column::SNIPER_STATE, MainWindow::STATUS_BIDDING)
   end
 
   private

@@ -2,7 +2,7 @@ require "test_helper"
 
 require "auction_sniper"
 require "price_source"
-require "sniper_state"
+require "sniper_snapshot"
 
 describe AuctionSniper do
   ITEM_ID = "item-id"
@@ -21,7 +21,7 @@ describe AuctionSniper do
 
   it "reports lost if auction closes when bidding" do
     @auction.stub_everything
-    @sniper_listener.stubs(:sniper_bidding).with(instance_of(SniperState)).then(@sniper_state.is("bidding"))
+    @sniper_listener.stubs(:sniper_bidding).with(instance_of(SniperSnapshot)).then(@sniper_state.is("bidding"))
     @sniper_listener.expects(:sniper_lost).at_least_once.when(@sniper_state.is("bidding"))
 
     @sniper.current_price(123, 45, PriceSource::FROM_OTHER_BIDDER)
@@ -42,7 +42,7 @@ describe AuctionSniper do
     increment = 25
     bid = price + increment
     @auction.expects(:bid).with(bid)
-    @sniper_listener.expects(:sniper_bidding).with(SniperState.new(ITEM_ID, price, bid)).at_least_once
+    @sniper_listener.expects(:sniper_bidding).with(SniperSnapshot.new(ITEM_ID, price, bid)).at_least_once
     @sniper.current_price(price, increment, PriceSource::FROM_OTHER_BIDDER)
   end
 

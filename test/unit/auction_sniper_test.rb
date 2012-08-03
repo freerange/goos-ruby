@@ -3,6 +3,7 @@ require "test_helper"
 require "auction_sniper"
 require "price_source"
 require "sniper_snapshot"
+require "sniper_state"
 
 describe AuctionSniper do
   ITEM_ID = "item-id"
@@ -21,7 +22,7 @@ describe AuctionSniper do
 
   it "reports lost if auction closes when bidding" do
     @auction.stub_everything
-    @sniper_listener.stubs(:sniper_bidding).with(instance_of(SniperSnapshot)).then(@sniper_state.is("bidding"))
+    @sniper_listener.stubs(:sniper_state_changed).with(&a_sniper_that_is(SniperState::BIDDING)).then(@sniper_state.is("bidding"))
     @sniper_listener.expects(:sniper_lost).at_least_once.when(@sniper_state.is("bidding"))
 
     @sniper.current_price(123, 45, PriceSource::FROM_OTHER_BIDDER)
@@ -30,7 +31,7 @@ describe AuctionSniper do
 
   it "reports won if auction closes when winning" do
     @auction.stub_everything
-    @sniper_listener.stubs(:sniper_winning).then(@sniper_state.is("winning"))
+    @sniper_listener.stubs(:sniper_state_changed).with(&a_sniper_that_is(SniperState::WINNING)).then(@sniper_state.is("winning"))
     @sniper_listener.expects(:sniper_won).at_least_once.when(@sniper_state.is("winning"))
 
     @sniper.current_price(123, 45, PriceSource::FROM_SNIPER)
@@ -42,12 +43,23 @@ describe AuctionSniper do
     increment = 25
     bid = price + increment
     @auction.expects(:bid).with(bid)
-    @sniper_listener.expects(:sniper_bidding).with(SniperSnapshot.new(ITEM_ID, price, bid)).at_least_once
+    @sniper_listener.expects(:sniper_state_changed).with(SniperSnapshot.new(ITEM_ID, price, bid, SniperState::BIDDING)).at_least_once
     @sniper.current_price(price, increment, PriceSource::FROM_OTHER_BIDDER)
   end
 
   it "reports is winning when current price comes from sniper" do
-    @sniper_listener.expects(:sniper_winning).at_least_once
-    @sniper.current_price(123, 45, PriceSource::FROM_SNIPER)
+    @auction.stub_everything
+    @sniper_listener.stubs(:sniper_state_changed).with(&a_sniper_that_is(SniperState::BIDDING)).then(@sniper_state.is("bidding"))
+    winning_snapshot = SniperSnapshot.new(ITEM_ID, 135, 135, SniperState::WINNING)
+    @sniper_listener.expects(:sniper_state_changed).with(winning_snapshot).at_least_once.when(@sniper_state.is("bidding"))
+
+    @sniper.current_price(123, 12, PriceSource::FROM_OTHER_BIDDER)
+    @sniper.current_price(135, 45, PriceSource::FROM_SNIPER)
+  end
+
+  private
+
+  def a_sniper_that_is(expected_state)
+    lambda { |snapshot| snapshot.state == expected_state }
   end
 end

@@ -31,22 +31,6 @@ class Main
         @ui.sniper_status_changed(state)
       end
     end
-
-    def sniper_won
-      show_status(MainWindow::STATUS_WON)
-    end
-
-    def sniper_lost
-      show_status(MainWindow::STATUS_LOST)
-    end
-
-    private
-
-    def show_status(status)
-      SwingUtilities.invokeLater do
-        @ui.show_status(status)
-      end
-    end
   end
 
   def initialize

@@ -9,21 +9,25 @@ class AuctionSniper
   end
 
   def current_price(price, increment, price_source)
-    if @is_winning = (price_source == PriceSource::FROM_SNIPER)
+    case price_source
+    when PriceSource::FROM_SNIPER
       @snapshot = @snapshot.winning(price)
-    else
+    when PriceSource::FROM_OTHER_BIDDER
       bid = price + increment
       @auction.bid(bid)
       @snapshot = @snapshot.bidding(price, bid)
     end
-    @sniper_listener.sniper_state_changed(@snapshot)
+    notify_change
   end
 
   def auction_closed
-    if @is_winning
-      @sniper_listener.sniper_won
-    else
-      @sniper_listener.sniper_lost
-    end
+    @snapshot = @snapshot.closed
+    notify_change
+  end
+
+  private
+
+  def notify_change
+    @sniper_listener.sniper_state_changed(@snapshot)
   end
 end

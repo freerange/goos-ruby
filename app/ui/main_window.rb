@@ -23,7 +23,7 @@ class MainWindow < JFrame
   STATUS_LOST = "lost"
 
   class SnipersTableModel < AbstractTableModel
-    STATUS_TEXT = [STATUS_JOINING, STATUS_BIDDING, STATUS_WINNING]
+    STATUS_TEXT = [STATUS_JOINING, STATUS_BIDDING, STATUS_WINNING, STATUS_LOST, STATUS_WON]
     STARTING_UP = SniperSnapshot.joining("")
 
     def initialize

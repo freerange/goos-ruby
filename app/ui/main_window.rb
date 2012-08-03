@@ -24,6 +24,7 @@ class MainWindow < JFrame
   STATUS_LOST = "lost"
 
   class SnipersTableModel < AbstractTableModel
+    STATUS_TEXT = [STATUS_JOINING, STATUS_BIDDING, STATUS_WINNING]
     STARTING_UP = SniperSnapshot.new("", 0, 0)
 
     def initialize
@@ -60,9 +61,9 @@ class MainWindow < JFrame
       fireTableRowsUpdated(0, 0)
     end
 
-    def sniper_status_changed(new_sniper_snapshot, new_status_text)
+    def sniper_status_changed(new_sniper_snapshot)
       @sniper_snapshot = new_sniper_snapshot
-      @status_text = new_status_text
+      @status_text = STATUS_TEXT[new_sniper_snapshot.state.ordinal]
       fireTableRowsUpdated(0, 0)
     end
   end
@@ -83,8 +84,8 @@ class MainWindow < JFrame
     @snipers.set_status_text(status_text)
   end
 
-  def sniper_status_changed(sniper_snapshot, status_text)
-    @snipers.sniper_status_changed(sniper_snapshot, status_text)
+  def sniper_status_changed(sniper_snapshot)
+    @snipers.sniper_status_changed(sniper_snapshot)
   end
 
   private

@@ -1,19 +1,22 @@
 require "price_source"
+require "sniper_snapshot"
 
 class AuctionSniper
   def initialize(item_id, auction, sniper_listener)
     @item_id, @auction, @sniper_listener = item_id, auction, sniper_listener
     @is_winning = false
+    @snapshot = SniperSnapshot.joining(item_id)
   end
 
   def current_price(price, increment, price_source)
     if @is_winning = (price_source == PriceSource::FROM_SNIPER)
-      @sniper_listener.sniper_winning
+      @snapshot = @snapshot.winning(price)
     else
       bid = price + increment
       @auction.bid(bid)
-      @sniper_listener.sniper_bidding(SniperSnapshot.new(@item_id, price, bid))
+      @snapshot = @snapshot.bidding(price, bid)
     end
+    @sniper_listener.sniper_state_changed(@snapshot)
   end
 
   def auction_closed

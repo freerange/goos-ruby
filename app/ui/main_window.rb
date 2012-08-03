@@ -14,7 +14,6 @@ class MainWindow < JFrame
 
   APPLICATION_TITLE = "Auction Sniper"
   MAIN_WINDOW_NAME = "Auction Sniper Main"
-  SNIPER_STATUS_NAME = "sniper status"
   SNIPERS_TABLE_NAME = "Snipers Table"
 
   STATUS_JOINING = "joining"
@@ -71,8 +70,6 @@ class MainWindow < JFrame
   def initialize
     super(APPLICATION_TITLE)
     setName(MAIN_WINDOW_NAME)
-    @sniper_status = create_label(STATUS_JOINING)
-    add(@sniper_status)
     @snipers = SnipersTableModel.new
     fill_content_pane(make_snipers_table)
     pack
@@ -89,13 +86,6 @@ class MainWindow < JFrame
   end
 
   private
-
-  def create_label(initial_text)
-    result = JLabel.new(initial_text)
-    result.setName(SNIPER_STATUS_NAME)
-    result.setBorder(LineBorder.new(Color::BLACK))
-    return result
-  end
 
   def fill_content_pane(snipers_table)
     content_pane = getContentPane

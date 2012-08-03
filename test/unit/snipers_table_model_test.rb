@@ -19,14 +19,7 @@ describe MainWindow::SnipersTableModel do
   end
 
   it "sets sniper values in columns" do
-    @listener.expects(:tableChanged).with do |actual|
-      expected = TableModelEvent.new(@model, 0)
-      matches = actual.instance_of?(TableModelEvent)
-      matches &&= (actual.getColumn == expected.getColumn)
-      matches &&= (actual.getFirstRow == expected.getFirstRow)
-      matches &&= (actual.getLastRow == expected.getLastRow)
-      matches
-    end
+    @listener.expects(:tableChanged).with(&a_row_changed_event_based_on(@model))
     @model.sniper_status_changed(SniperSnapshot.new("item id", 555, 666, SniperState::BIDDING))
     assert_column_equals(Column::ITEM_IDENTIFIER, "item id")
     assert_column_equals(Column::LAST_PRICE, 555)
@@ -35,6 +28,18 @@ describe MainWindow::SnipersTableModel do
   end
 
   private
+
+  def a_row_changed_event_based_on(model)
+    lambda do |event|
+      expected = TableModelEvent.new(model, 0)
+      (
+        event.instance_of?(TableModelEvent) &&
+        (event.getColumn == expected.getColumn) &&
+        (event.getFirstRow == expected.getFirstRow) &&
+        (event.getLastRow == expected.getLastRow)
+      )
+    end
+  end
 
   def assert_column_equals(column, expected)
     row_index, column_index = 0, column.ordinal

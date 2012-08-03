@@ -24,7 +24,7 @@ class MainWindow < JFrame
 
   class SnipersTableModel < AbstractTableModel
     STATUS_TEXT = [STATUS_JOINING, STATUS_BIDDING, STATUS_WINNING]
-    STARTING_UP = SniperSnapshot.new("", 0, 0)
+    STARTING_UP = SniperSnapshot.joining("")
 
     def initialize
       super

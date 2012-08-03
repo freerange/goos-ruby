@@ -16,14 +16,14 @@ describe AuctionSniper do
   end
 
   it "reports lost when auction closes immediately" do
-    @sniper_listener.expects(:sniper_lost).at_least_once
+    @sniper_listener.expects(:sniper_state_changed).with(&a_sniper_that_is(SniperState::LOST)).at_least_once
     @sniper.auction_closed
   end
 
   it "reports lost if auction closes when bidding" do
     @auction.stub_everything
     @sniper_listener.stubs(:sniper_state_changed).with(&a_sniper_that_is(SniperState::BIDDING)).then(@sniper_state.is("bidding"))
-    @sniper_listener.expects(:sniper_lost).at_least_once.when(@sniper_state.is("bidding"))
+    @sniper_listener.expects(:sniper_state_changed).with(&a_sniper_that_is(SniperState::LOST)).at_least_once.when(@sniper_state.is("bidding"))
 
     @sniper.current_price(123, 45, PriceSource::FROM_OTHER_BIDDER)
     @sniper.auction_closed
@@ -32,7 +32,7 @@ describe AuctionSniper do
   it "reports won if auction closes when winning" do
     @auction.stub_everything
     @sniper_listener.stubs(:sniper_state_changed).with(&a_sniper_that_is(SniperState::WINNING)).then(@sniper_state.is("winning"))
-    @sniper_listener.expects(:sniper_won).at_least_once.when(@sniper_state.is("winning"))
+    @sniper_listener.expects(:sniper_state_changed).with(&a_sniper_that_is(SniperState::WON)).at_least_once.when(@sniper_state.is("winning"))
 
     @sniper.current_price(123, 45, PriceSource::FROM_SNIPER)
     @sniper.auction_closed

@@ -24,7 +24,7 @@ describe MainWindow::SnipersTableModel do
     assert_column_equals(Column::ITEM_IDENTIFIER, "item id")
     assert_column_equals(Column::LAST_PRICE, 555)
     assert_column_equals(Column::LAST_BID, 666)
-    assert_column_equals(Column::SNIPER_STATE, MainWindow::STATUS_BIDDING)
+    assert_column_equals(Column::SNIPER_STATE, MainWindow::SnipersTableModel.text_for(SniperState::BIDDING))
   end
 
   private

@@ -16,19 +16,12 @@ class MainWindow < JFrame
   MAIN_WINDOW_NAME = "Auction Sniper Main"
   SNIPERS_TABLE_NAME = "Snipers Table"
 
-  STATUS_JOINING = "joining"
-  STATUS_BIDDING = "bidding"
-  STATUS_WINNING = "winning"
-  STATUS_WON = "won"
-  STATUS_LOST = "lost"
-
   class SnipersTableModel < AbstractTableModel
-    STATUS_TEXT = [STATUS_JOINING, STATUS_BIDDING, STATUS_WINNING, STATUS_LOST, STATUS_WON]
+    STATUS_TEXT = %w(joining bidding winning won lost)
     STARTING_UP = SniperSnapshot.joining("")
 
     def initialize
       super
-      @status_text = STATUS_JOINING
       @sniper_snapshot = STARTING_UP
     end
 
@@ -49,21 +42,19 @@ class MainWindow < JFrame
       when Column::LAST_BID
         return @sniper_snapshot.last_bid
       when Column::SNIPER_STATE
-        return @status_text
+        return self.class.text_for(@sniper_snapshot.state)
       else
         raise new ArgumentError("No column at " + column_index)
       end
     end
 
-    def set_status_text(new_status_text)
-      @status_text = new_status_text
+    def sniper_status_changed(new_sniper_snapshot)
+      @sniper_snapshot = new_sniper_snapshot
       fireTableRowsUpdated(0, 0)
     end
 
-    def sniper_status_changed(new_sniper_snapshot)
-      @sniper_snapshot = new_sniper_snapshot
-      @status_text = STATUS_TEXT[new_sniper_snapshot.state.ordinal]
-      fireTableRowsUpdated(0, 0)
+    def self.text_for(state)
+      STATUS_TEXT[state.ordinal]
     end
   end
 
@@ -75,10 +66,6 @@ class MainWindow < JFrame
     pack
     setDefaultCloseOperation(JFrame::EXIT_ON_CLOSE)
     setVisible(true)
-  end
-
-  def show_status(status_text)
-    @snipers.set_status_text(status_text)
   end
 
   def sniper_status_changed(sniper_snapshot)

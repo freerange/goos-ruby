@@ -20,15 +20,16 @@ class ApplicationRunner
     thread.setDaemon(true)
     thread.start
     @driver = AuctionSniperDriver.new(1000)
-    @driver.shows_sniper_status_text(MainWindow::SnipersTableModel.text_for(SniperState::JOINING))
+    starting_up = MainWindow::SnipersTableModel::STARTING_UP
+    @driver.shows_sniper_status(starting_up.item_id, starting_up.last_price, starting_up.last_bid, MainWindow::SnipersTableModel.text_for(SniperState::JOINING))
   end
 
   def has_shown_sniper_is_bidding(last_price, last_bid)
     @driver.shows_sniper_status(@item_id, last_price, last_bid, MainWindow::SnipersTableModel.text_for(SniperState::BIDDING))
   end
 
-  def shows_sniper_has_lost_auction
-    @driver.shows_sniper_status_text(MainWindow::SnipersTableModel.text_for(SniperState::LOST))
+  def shows_sniper_has_lost_auction(last_price, last_bid)
+    @driver.shows_sniper_status(@item_id, last_price, last_bid, MainWindow::SnipersTableModel.text_for(SniperState::LOST))
   end
 
   def has_shown_sniper_is_winning(winning_bid)

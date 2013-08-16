@@ -20,7 +20,7 @@ describe AuctionSniper do
     @application.start_bidding_in(@auction)
     @auction.has_received_join_request_from(ApplicationRunner::SNIPER_XMPP_ID)
     @auction.announce_closed
-    @application.shows_sniper_has_lost_auction
+    @application.shows_sniper_has_lost_auction(0, 0)
   end
 
   it "makes a higher bid but loses" do
@@ -31,7 +31,7 @@ describe AuctionSniper do
     @application.has_shown_sniper_is_bidding(1000, 1098)
     @auction.has_received_bid(1098, ApplicationRunner::SNIPER_XMPP_ID)
     @auction.announce_closed
-    @application.shows_sniper_has_lost_auction
+    @application.shows_sniper_has_lost_auction(1000, 1098)
   end
 
   it "wins an auction by bidding higher" do

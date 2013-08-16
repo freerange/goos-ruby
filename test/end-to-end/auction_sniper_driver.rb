@@ -21,13 +21,6 @@ class AuctionSniperDriver < JFrameDriver
     )
   end
 
-  def shows_sniper_status_text(status_text)
-    JTableDriver.new(
-      self,
-      ComponentDriver.named(MainWindow::SNIPERS_TABLE_NAME)
-    ).hasCell(JLabelTextMatcher.withLabelText(Matchers.equalTo(status_text)))
-  end
-
   def shows_sniper_status(item_id, last_price, last_bid, status_text)
     JTableDriver.new(
       self,

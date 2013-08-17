@@ -34,18 +34,7 @@ class MainWindow < JFrame
     end
 
     def getValueAt(row_index, column_index)
-      case Column.at(column_index)
-      when Column::ITEM_IDENTIFIER
-        return @sniper_snapshot.item_id
-      when Column::LAST_PRICE
-        return @sniper_snapshot.last_price
-      when Column::LAST_BID
-        return @sniper_snapshot.last_bid
-      when Column::SNIPER_STATE
-        return self.class.text_for(@sniper_snapshot.state)
-      else
-        raise new ArgumentError("No column at " + column_index)
-      end
+      Column.at(column_index).value_in(@sniper_snapshot)
     end
 
     def sniper_status_changed(new_sniper_snapshot)

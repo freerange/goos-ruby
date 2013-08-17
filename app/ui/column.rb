@@ -2,10 +2,10 @@ require "ui/main_window"
 
 class Column < Struct.new(:name)
 
-  ITEM_IDENTIFIER = new("ITEM_IDENTIFIER")
-  LAST_PRICE = new("LAST_PRICE")
-  LAST_BID = new("LAST_BID")
-  SNIPER_STATE = new("SNIPER_STATE")
+  ITEM_IDENTIFIER = new("Item")
+  LAST_PRICE = new("Last Price")
+  LAST_BID = new("Last Bid")
+  SNIPER_STATE = new("State")
 
   def ITEM_IDENTIFIER.value_in(snapshot)
     snapshot.item_id

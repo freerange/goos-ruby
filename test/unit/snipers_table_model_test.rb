@@ -18,6 +18,12 @@ describe MainWindow::SnipersTableModel do
     assert_equal Column.values.length, @model.getColumnCount
   end
 
+  it "sets up column headings" do
+    Column.values.each do |column|
+      assert_equal column.name, @model.getColumnName(column.ordinal)
+    end
+  end
+
   it "sets sniper values in columns" do
     @listener.expects(:tableChanged).with(&a_row_changed_event_based_on(@model))
     @model.sniper_status_changed(SniperSnapshot.new("item id", 555, 666, SniperState::BIDDING))

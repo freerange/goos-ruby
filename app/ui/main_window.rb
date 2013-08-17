@@ -37,6 +37,10 @@ class MainWindow < JFrame
       Column.at(column_index).value_in(@sniper_snapshot)
     end
 
+    def getColumnName(column)
+      return Column.at(column).name
+    end
+
     def sniper_status_changed(new_sniper_snapshot)
       @sniper_snapshot = new_sniper_snapshot
       fireTableRowsUpdated(0, 0)

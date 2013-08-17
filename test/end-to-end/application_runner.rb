@@ -8,10 +8,9 @@ class ApplicationRunner
   SNIPER_XMPP_ID = SNIPER_ID + "@" + FakeAuctionServer::XMPP_HOSTNAME + "/Auction"
 
   def start_bidding_in(auction)
-    @item_id = auction.item_id
     thread = Thread.new do
       begin
-        Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, @item_id)
+        Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.item_id)
       rescue => e
         puts %{\n#{e}\n#{e.backtrace.join("\n")}}
       end
@@ -23,20 +22,20 @@ class ApplicationRunner
     @driver.shows_sniper_status(starting_up.item_id, starting_up.last_price, starting_up.last_bid, MainWindow::SnipersTableModel.text_for(SniperState::JOINING))
   end
 
-  def has_shown_sniper_is_bidding(last_price, last_bid)
-    @driver.shows_sniper_status(@item_id, last_price, last_bid, MainWindow::SnipersTableModel.text_for(SniperState::BIDDING))
+  def has_shown_sniper_is_bidding(auction, last_price, last_bid)
+    @driver.shows_sniper_status(auction.item_id, last_price, last_bid, MainWindow::SnipersTableModel.text_for(SniperState::BIDDING))
   end
 
-  def shows_sniper_has_lost_auction(last_price, last_bid)
-    @driver.shows_sniper_status(@item_id, last_price, last_bid, MainWindow::SnipersTableModel.text_for(SniperState::LOST))
+  def shows_sniper_has_lost_auction(auction, last_price, last_bid)
+    @driver.shows_sniper_status(auction.item_id, last_price, last_bid, MainWindow::SnipersTableModel.text_for(SniperState::LOST))
   end
 
-  def has_shown_sniper_is_winning(winning_bid)
-    @driver.shows_sniper_status(@item_id, winning_bid, winning_bid, MainWindow::SnipersTableModel.text_for(SniperState::WINNING))
+  def has_shown_sniper_is_winning(auction, winning_bid)
+    @driver.shows_sniper_status(auction.item_id, winning_bid, winning_bid, MainWindow::SnipersTableModel.text_for(SniperState::WINNING))
   end
 
-  def shows_sniper_has_won_auction(last_price)
-    @driver.shows_sniper_status(@item_id, last_price, last_price, MainWindow::SnipersTableModel.text_for(SniperState::WON))
+  def shows_sniper_has_won_auction(auction, last_price)
+    @driver.shows_sniper_status(auction.item_id, last_price, last_price, MainWindow::SnipersTableModel.text_for(SniperState::WON))
   end
 
   def stop

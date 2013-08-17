@@ -20,6 +20,8 @@ class ApplicationRunner
     thread.setDaemon(true)
     thread.start
     @driver = AuctionSniperDriver.new(1000)
+    @driver.hasTitle(MainWindow::APPLICATION_TITLE)
+    @driver.has_column_titles
     starting_up = MainWindow::SnipersTableModel::STARTING_UP
     @driver.shows_sniper_status(starting_up.item_id, starting_up.last_price, starting_up.last_bid, MainWindow::SnipersTableModel.text_for(SniperState::JOINING))
   end

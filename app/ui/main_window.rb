@@ -47,18 +47,14 @@ class MainWindow < JFrame
     end
   end
 
-  def initialize
+  def initialize(snipers)
     super(APPLICATION_TITLE)
     setName(MAIN_WINDOW_NAME)
-    @snipers = SnipersTableModel.new
+    @snipers = snipers
     fill_content_pane(make_snipers_table)
     pack
     setDefaultCloseOperation(JFrame::EXIT_ON_CLOSE)
     setVisible(true)
-  end
-
-  def sniper_status_changed(sniper_snapshot)
-    @snipers.sniper_status_changed(sniper_snapshot)
   end
 
   private

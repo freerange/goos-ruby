@@ -21,14 +21,14 @@ class Main
   ITEM_ID_AS_LOGIN = "auction-%s"
   AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE
 
-  class SniperStateDisplayer
-    def initialize(ui)
-      @ui = ui
+  class SwingThreadSniperListener
+    def initialize(snipers)
+      @snipers = snipers
     end
 
-    def sniper_state_changed(state)
+    def sniper_state_changed(snapshot)
       SwingUtilities.invokeLater do
-        @ui.sniper_status_changed(state)
+        @snipers.sniper_status_changed(snapshot)
       end
     end
   end
@@ -52,7 +52,7 @@ class Main
     chat.addMessageListener(
       AuctionMessageTranslator.new(
         connection.getUser,
-        AuctionSniper.new(item_id, auction, SniperStateDisplayer.new(@ui))
+        AuctionSniper.new(item_id, auction, SwingThreadSniperListener.new(@snipers))
       )
     )
     auction.join
@@ -68,8 +68,9 @@ class Main
   private
 
   def start_user_interface
+    @snipers = MainWindow::SnipersTableModel.new
     SwingUtilities.invokeAndWait do
-      @ui = MainWindow.new
+      @ui = MainWindow.new(@snipers)
     end
   end
 

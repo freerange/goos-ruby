@@ -28,7 +28,7 @@ class Main
 
     def sniper_state_changed(snapshot)
       SwingUtilities.invokeLater do
-        @snipers.sniper_status_changed(snapshot)
+        @snipers.sniper_state_changed(snapshot)
       end
     end
   end

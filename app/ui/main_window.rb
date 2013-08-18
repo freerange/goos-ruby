@@ -40,7 +40,7 @@ class MainWindow < JFrame
       return Column.at(column).name
     end
 
-    def sniper_status_changed(new_snapshot)
+    def sniper_state_changed(new_snapshot)
       if index = @snapshots.find_index { |s| new_snapshot.for_same_item_as?(s) }
         @snapshots[index] = new_snapshot
         fireTableRowsUpdated(index, index)

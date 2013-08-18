@@ -25,8 +25,7 @@ class SingleMessageListener
 
   def receives_a_message(message_matcher)
     message = @messages.poll(5, TimeUnit::SECONDS)
-    Assert.assertThat("Message", message, Matchers.is(Matchers.notNullValue()))
-    Assert.assertThat(message.getBody, message_matcher)
+    Assert.assertThat(message, org.hamcrest.Matchers.hasProperty("body", message_matcher))
   end
 end
 

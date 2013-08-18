@@ -33,16 +33,20 @@ class MainWindow < JFrame
     end
 
     def getValueAt(row_index, column_index)
-      Column.at(column_index).value_in(@snapshots[0])
+      Column.at(column_index).value_in(@snapshots[row_index])
     end
 
     def getColumnName(column)
       return Column.at(column).name
     end
 
-    def sniper_status_changed(new_sniper_snapshot)
-      @snapshots[0] = new_sniper_snapshot
-      fireTableRowsUpdated(0, 0)
+    def sniper_status_changed(new_snapshot)
+      if index = @snapshots.find_index { |s| new_snapshot.for_same_item_as?(s) }
+        @snapshots[index] = new_snapshot
+        fireTableRowsUpdated(index, index)
+      else
+        raise "No existing Sniper state for #{new_snapshot.item_id}"
+      end
     end
 
     def self.text_for(state)
@@ -51,7 +55,8 @@ class MainWindow < JFrame
 
     def add_sniper(snapshot)
       @snapshots << snapshot
-      fireTableRowsInserted(0, 0)
+      row = @snapshots.length - 1
+      fireTableRowsInserted(row, row)
     end
   end
 

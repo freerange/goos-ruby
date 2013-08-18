@@ -16,4 +16,8 @@ class SniperSnapshot < Struct.new(:item_id, :last_price, :last_bid, :state)
   def closed
     SniperSnapshot.new(item_id, last_price, last_bid, state.when_auction_closed)
   end
+
+  def for_same_item_as?(sniper_snapshot)
+    item_id == sniper_snapshot.item_id
+  end
 end

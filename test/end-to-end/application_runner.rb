@@ -8,18 +8,11 @@ class ApplicationRunner
   SNIPER_XMPP_ID = SNIPER_ID + "@" + FakeAuctionServer::XMPP_HOSTNAME + "/Auction"
 
   def start_bidding_in(*auctions)
-    thread = Thread.new do
-      begin
-        Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, *auctions.map(&:item_id))
-      rescue => e
-        puts %{\n#{e}\n#{e.backtrace.join("\n")}}
-      end
-    end
-    @driver = AuctionSniperDriver.new(1000)
-    @driver.hasTitle(MainWindow::APPLICATION_TITLE)
-    @driver.has_column_titles
+    start_sniper
     auctions.each do |auction|
-      @driver.shows_sniper_status(auction.item_id, 0, 0, MainWindow::SnipersTableModel.text_for(SniperState::JOINING))
+      item_id = auction.item_id
+      @driver.start_bidding_for(item_id)
+      @driver.shows_sniper_status(item_id, 0, 0, MainWindow::SnipersTableModel.text_for(SniperState::JOINING))
     end
   end
 
@@ -43,5 +36,21 @@ class ApplicationRunner
     unless @driver.nil?
       @driver.dispose
     end
+  end
+
+  private
+
+  def start_sniper
+    thread = Thread.new do
+      begin
+        Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD)
+      rescue => e
+        puts %{\n#{e}\n#{e.backtrace.join("\n")}}
+      end
+    end
+
+    @driver = AuctionSniperDriver.new(1000)
+    @driver.hasTitle(MainWindow::APPLICATION_TITLE)
+    @driver.has_column_titles
   end
 end

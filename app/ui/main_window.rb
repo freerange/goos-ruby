@@ -15,6 +15,8 @@ class MainWindow < JFrame
   APPLICATION_TITLE = "Auction Sniper"
   MAIN_WINDOW_NAME = "Auction Sniper Main"
   SNIPERS_TABLE_NAME = "Snipers Table"
+  NEW_ITEM_ID_NAME = "item id"
+  JOIN_BUTTON_NAME = "join button"
 
   class SnipersTableModel < AbstractTableModel
     STATUS_TEXT = %w(joining bidding winning won lost)

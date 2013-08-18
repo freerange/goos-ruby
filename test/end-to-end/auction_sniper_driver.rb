@@ -1,9 +1,13 @@
 java_import javax.swing.table.JTableHeader
+java_import javax.swing.JTextField
+java_import javax.swing.JButton
 
 java_import com.objogate.wl.swing.driver.ComponentDriver
 java_import com.objogate.wl.swing.driver.JFrameDriver
 java_import com.objogate.wl.swing.driver.JTableDriver
 java_import com.objogate.wl.swing.driver.JTableHeaderDriver
+java_import com.objogate.wl.swing.driver.JTextFieldDriver
+java_import com.objogate.wl.swing.driver.JButtonDriver
 java_import com.objogate.wl.swing.gesture.GesturePerformer
 java_import com.objogate.wl.swing.AWTEventQueueProber
 java_import com.objogate.wl.swing.matcher.JLabelTextMatcher
@@ -46,5 +50,20 @@ class AuctionSniperDriver < JFrameDriver
       JLabelTextMatcher.withLabelText("Last Bid"),
       JLabelTextMatcher.withLabelText("State")
     ))
+  end
+
+  def start_bidding_for(item_id)
+    item_id_field.replaceAllText(item_id)
+    bid_button.click
+  end
+
+  def item_id_field
+    new_item_id = JTextFieldDriver.new(self, JTextField.java_class, ComponentDriver.named(MainWindow::NEW_ITEM_ID_NAME))
+    new_item_id.focusWithMouse
+    return new_item_id
+  end
+
+  def bid_button
+    return JButtonDriver.new(self, JButton.java_class, ComponentDriver.named(MainWindow::JOIN_BUTTON_NAME))
   end
 end

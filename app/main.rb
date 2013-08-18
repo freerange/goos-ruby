@@ -48,6 +48,7 @@ class Main
   end
 
   def join_auction(connection, item_id)
+    safely_add_item_to_model(item_id)
     chat = connection.getChatManager.createChat(auction_id(item_id, connection), nil)
     @not_to_be_garbage_collected << chat
 
@@ -87,5 +88,11 @@ class Main
 
   def auction_id(item_id, connection)
     format(AUCTION_ID_FORMAT, item_id, connection.getServiceName)
+  end
+
+  def safely_add_item_to_model(item_id)
+    SwingUtilities.invokeAndWait do
+      @snipers.add_sniper(SniperSnapshot.joining(item_id))
+    end
   end
 end

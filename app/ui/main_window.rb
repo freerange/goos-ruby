@@ -18,11 +18,10 @@ class MainWindow < JFrame
 
   class SnipersTableModel < AbstractTableModel
     STATUS_TEXT = %w(joining bidding winning won lost)
-    STARTING_UP = SniperSnapshot.joining("")
 
     def initialize
       super
-      @sniper_snapshot = STARTING_UP
+      @snapshots = []
     end
 
     def getColumnCount
@@ -30,11 +29,11 @@ class MainWindow < JFrame
     end
 
     def getRowCount
-      return 1
+      return @snapshots.length
     end
 
     def getValueAt(row_index, column_index)
-      Column.at(column_index).value_in(@sniper_snapshot)
+      Column.at(column_index).value_in(@snapshots[0])
     end
 
     def getColumnName(column)
@@ -42,12 +41,17 @@ class MainWindow < JFrame
     end
 
     def sniper_status_changed(new_sniper_snapshot)
-      @sniper_snapshot = new_sniper_snapshot
+      @snapshots[0] = new_sniper_snapshot
       fireTableRowsUpdated(0, 0)
     end
 
     def self.text_for(state)
       STATUS_TEXT[state.ordinal]
+    end
+
+    def add_sniper(snapshot)
+      @snapshots << snapshot
+      fireTableRowsInserted(0, 0)
     end
   end
 

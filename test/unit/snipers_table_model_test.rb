@@ -33,6 +33,32 @@ describe MainWindow::SnipersTableModel do
     assert_row_matches_snapshot(0, joining)
   end
 
+  it "holds snipers in addition order" do
+    @listener.stubs(:tableChanged)
+    @model.add_sniper(SniperSnapshot.joining("item 0"))
+    @model.add_sniper(SniperSnapshot.joining("item 1"))
+    assert_equal "item 0", cell_value(0, Column::ITEM_IDENTIFIER)
+    assert_equal "item 1", cell_value(1, Column::ITEM_IDENTIFIER)
+  end
+
+  it "updates correct row for sniper" do
+    @listener.stubs(:tableChanged).with(&any_insertion_event)
+    @listener.expects(:tableChanged).with(&a_change_in_row(1))
+    sniper_0 = SniperSnapshot.joining("item 0")
+    sniper_1 = SniperSnapshot.joining("item 1")
+    @model.add_sniper(sniper_0)
+    @model.add_sniper(sniper_1)
+    winning_1 = sniper_1.winning(123)
+    @model.sniper_status_changed(winning_1)
+    assert_row_matches_snapshot(1, winning_1)
+  end
+
+  it "raises exception if no existing sniper for an update" do
+    assert_raises(RuntimeError) do
+      @model.sniper_status_changed(SniperSnapshot.new("item 1", 123, 234, SniperState::WINNING))
+    end
+  end
+
   it "sets sniper values in columns" do
     joining = SniperSnapshot.joining("item123")
     bidding = joining.bidding(555, 666)

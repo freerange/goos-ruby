@@ -34,19 +34,22 @@ class Main
   end
 
   def initialize
+    @not_to_be_garbage_collected = []
     start_user_interface
   end
 
   def self.main(*args)
     main = Main.new
-    main.join_auction(connection(args[ARG_HOSTNAME], args[ARG_USERNAME], args[ARG_PASSWORD]), args[ARG_ITEM_ID])
+    connection = connection(args[ARG_HOSTNAME], args[ARG_USERNAME], args[ARG_PASSWORD]);
+    main.disconnect_when_ui_closes(connection);
+    args[3..-1].each do |item_id|
+      main.join_auction(connection, item_id)
+    end
   end
 
   def join_auction(connection, item_id)
-    disconnect_when_ui_closes(connection)
-
     chat = connection.getChatManager.createChat(auction_id(item_id, connection), nil)
-    @not_to_be_garbage_collected = chat
+    @not_to_be_garbage_collected << chat
 
     auction = XMPPAuction.new(chat)
     chat.addMessageListener(
@@ -65,6 +68,14 @@ class Main
     return connection
   end
 
+  def disconnect_when_ui_closes(connection)
+    @ui.addWindowListener do |event|
+      if event.paramString[/WINDOW_CLOSED/]
+        connection.disconnect
+      end
+    end
+  end
+
   private
 
   def start_user_interface
@@ -76,13 +87,5 @@ class Main
 
   def auction_id(item_id, connection)
     format(AUCTION_ID_FORMAT, item_id, connection.getServiceName)
-  end
-
-  def disconnect_when_ui_closes(connection)
-    @ui.addWindowListener do |event|
-      if event.paramString[/WINDOW_CLOSED/]
-        connection.disconnect
-      end
-    end
   end
 end

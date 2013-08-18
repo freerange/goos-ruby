@@ -49,13 +49,13 @@ describe MainWindow::SnipersTableModel do
     @model.add_sniper(sniper_0)
     @model.add_sniper(sniper_1)
     winning_1 = sniper_1.winning(123)
-    @model.sniper_status_changed(winning_1)
+    @model.sniper_state_changed(winning_1)
     assert_row_matches_snapshot(1, winning_1)
   end
 
   it "raises exception if no existing sniper for an update" do
     assert_raises(RuntimeError) do
-      @model.sniper_status_changed(SniperSnapshot.new("item 1", 123, 234, SniperState::WINNING))
+      @model.sniper_state_changed(SniperSnapshot.new("item 1", 123, 234, SniperState::WINNING))
     end
   end
 
@@ -65,7 +65,7 @@ describe MainWindow::SnipersTableModel do
     @listener.stubs(:tableChanged).with(&any_insertion_event)
     @listener.expects(:tableChanged).with(&a_change_in_row(0))
     @model.add_sniper(joining)
-    @model.sniper_status_changed(bidding)
+    @model.sniper_state_changed(bidding)
     assert_row_matches_snapshot(0, bidding)
   end
 

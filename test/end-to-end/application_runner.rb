@@ -7,10 +7,10 @@ class ApplicationRunner
   SNIPER_PASSWORD = "sniper"
   SNIPER_XMPP_ID = SNIPER_ID + "@" + FakeAuctionServer::XMPP_HOSTNAME + "/Auction"
 
-  def start_bidding_in(auction)
+  def start_bidding_in(*auctions)
     thread = java.lang.Thread.new do
       begin
-        Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.item_id)
+        Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, *auctions.map(&:item_id))
       rescue => e
         puts %{\n#{e}\n#{e.backtrace.join("\n")}}
       end

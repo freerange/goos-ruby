@@ -34,32 +34,14 @@ class Main
   end
 
   def initialize
-    @not_to_be_garbage_collected = []
     start_user_interface
   end
 
   def self.main(*args)
     main = Main.new
     connection = connection(args[ARG_HOSTNAME], args[ARG_USERNAME], args[ARG_PASSWORD]);
-    main.disconnect_when_ui_closes(connection);
-    args[3..-1].each do |item_id|
-      main.join_auction(connection, item_id)
-    end
-  end
-
-  def join_auction(connection, item_id)
-    safely_add_item_to_model(item_id)
-    chat = connection.getChatManager.createChat(auction_id(item_id, connection), nil)
-    @not_to_be_garbage_collected << chat
-
-    auction = XMPPAuction.new(chat)
-    chat.addMessageListener(
-      AuctionMessageTranslator.new(
-        connection.getUser,
-        AuctionSniper.new(item_id, auction, SwingThreadSniperListener.new(@snipers))
-      )
-    )
-    auction.join
+    main.disconnect_when_ui_closes(connection)
+    main.add_user_request_listener_for(connection)
   end
 
   def self.connection(hostname, username, password)
@@ -77,22 +59,44 @@ class Main
     end
   end
 
+  def add_user_request_listener_for(connection)
+    @ui.add_user_request_listener(
+      Class.new do
+        def initialize(connection, snipers)
+          @connection, @snipers = connection, snipers
+          @not_to_be_garbage_collected = []
+        end
+
+        def join_auction(item_id)
+          @snipers.add_sniper(SniperSnapshot.joining(item_id))
+          chat = @connection.getChatManager.createChat(auction_id(item_id, @connection), nil)
+          @not_to_be_garbage_collected << chat
+
+          auction = XMPPAuction.new(chat)
+          chat.addMessageListener(
+            AuctionMessageTranslator.new(
+              @connection.getUser,
+              AuctionSniper.new(item_id, auction, SwingThreadSniperListener.new(@snipers))
+            )
+          )
+          auction.join
+        end
+
+        private
+
+        def auction_id(item_id, connection)
+          format(AUCTION_ID_FORMAT, item_id, connection.getServiceName)
+        end
+      end.new(connection, @snipers)
+    )
+  end
+
   private
 
   def start_user_interface
     @snipers = MainWindow::SnipersTableModel.new
     SwingUtilities.invokeAndWait do
       @ui = MainWindow.new(@snipers)
-    end
-  end
-
-  def auction_id(item_id, connection)
-    format(AUCTION_ID_FORMAT, item_id, connection.getServiceName)
-  end
-
-  def safely_add_item_to_model(item_id)
-    SwingUtilities.invokeAndWait do
-      @snipers.add_sniper(SniperSnapshot.joining(item_id))
     end
   end
 end

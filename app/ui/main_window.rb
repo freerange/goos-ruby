@@ -2,10 +2,14 @@ java_import javax.swing.JFrame
 java_import javax.swing.JTable
 java_import javax.swing.JScrollPane
 java_import javax.swing.JLabel
+java_import javax.swing.JPanel
+java_import javax.swing.JTextField
+java_import javax.swing.JButton
 java_import javax.swing.border.LineBorder
 java_import javax.swing.table.AbstractTableModel
 java_import java.awt.Color
 java_import java.awt.BorderLayout
+java_import java.awt.FlowLayout
 
 require "ui/column"
 require "sniper_snapshot"
@@ -66,7 +70,7 @@ class MainWindow < JFrame
     super(APPLICATION_TITLE)
     setName(MAIN_WINDOW_NAME)
     @snipers = snipers
-    fill_content_pane(make_snipers_table)
+    fill_content_pane(make_snipers_table, make_controls)
     pack
     setDefaultCloseOperation(JFrame::EXIT_ON_CLOSE)
     setVisible(true)
@@ -74,9 +78,10 @@ class MainWindow < JFrame
 
   private
 
-  def fill_content_pane(snipers_table)
+  def fill_content_pane(snipers_table, controls)
     content_pane = getContentPane
     content_pane.setLayout(BorderLayout.new)
+    content_pane.add(controls, BorderLayout::NORTH)
     content_pane.add(JScrollPane.new(snipers_table), BorderLayout::CENTER)
   end
 
@@ -84,5 +89,17 @@ class MainWindow < JFrame
     snipers_table = JTable.new(@snipers)
     snipers_table.setName(SNIPERS_TABLE_NAME)
     return snipers_table
+  end
+
+  def make_controls
+    controls = JPanel.new(FlowLayout.new)
+    item_id_field = JTextField.new
+    item_id_field.setColumns(25)
+    item_id_field.setName(NEW_ITEM_ID_NAME)
+    controls.add(item_id_field)
+    join_auction_button = JButton.new("Join Auction")
+    join_auction_button.setName(JOIN_BUTTON_NAME)
+    controls.add(join_auction_button)
+    return controls
   end
 end

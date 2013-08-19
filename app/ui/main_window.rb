@@ -76,6 +76,9 @@ class MainWindow < JFrame
     setVisible(true)
   end
 
+  def add_user_request_listener(user_request_listener)
+  end
+
   private
 
   def fill_content_pane(snipers_table, controls)

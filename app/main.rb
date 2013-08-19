@@ -70,15 +70,17 @@ class Main
         def join_auction(item_id)
           @snipers.add_sniper(SniperSnapshot.joining(item_id))
           chat = @connection.getChatManager.createChat(auction_id(item_id, @connection), nil)
-          @not_to_be_garbage_collected << chat
-
-          auction = XMPPAuction.new(chat)
+          auction_event_listeners = Announcer.new
           chat.addMessageListener(
             AuctionMessageTranslator.new(
               @connection.getUser,
-              AuctionSniper.new(item_id, auction, SwingThreadSniperListener.new(@snipers))
+              auction_event_listeners.announce
             )
           )
+          @not_to_be_garbage_collected << chat
+
+          auction = XMPPAuction.new(chat)
+          auction_event_listeners.add_listener(AuctionSniper.new(item_id, auction, SwingThreadSniperListener.new(@snipers)))
           auction.join
         end
 

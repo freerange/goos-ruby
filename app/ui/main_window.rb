@@ -13,6 +13,7 @@ java_import java.awt.FlowLayout
 
 require "ui/column"
 require "sniper_snapshot"
+require "announcer"
 
 class MainWindow < JFrame
 
@@ -70,6 +71,7 @@ class MainWindow < JFrame
     super(APPLICATION_TITLE)
     setName(MAIN_WINDOW_NAME)
     @snipers = snipers
+    @user_requests = Announcer.new
     fill_content_pane(make_snipers_table, make_controls)
     pack
     setDefaultCloseOperation(JFrame::EXIT_ON_CLOSE)
@@ -77,6 +79,7 @@ class MainWindow < JFrame
   end
 
   def add_user_request_listener(user_request_listener)
+    @user_requests.add_listener(user_request_listener)
   end
 
   private
@@ -102,6 +105,9 @@ class MainWindow < JFrame
     controls.add(item_id_field)
     join_auction_button = JButton.new("Join Auction")
     join_auction_button.setName(JOIN_BUTTON_NAME)
+    join_auction_button.addActionListener do |event|
+      @user_requests.announce.join_auction(item_id_field.getText)
+    end
     controls.add(join_auction_button)
     return controls
   end

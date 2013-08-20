@@ -1,6 +1,6 @@
 require "test_helper"
 
-require "ui/main_window"
+require "ui/snipers_table_model"
 require "ui/column"
 require "sniper_snapshot"
 require "sniper_state"
@@ -8,10 +8,10 @@ require "auction_sniper"
 
 java_import javax.swing.event.TableModelEvent
 
-describe MainWindow::SnipersTableModel do
+describe SnipersTableModel do
   before do
     @listener = mock("TableModelListener")
-    @model = MainWindow::SnipersTableModel.new
+    @model = SnipersTableModel.new
     @model.addTableModelListener(@listener)
     @sniper = AuctionSniper.new("item 0", nil)
   end
@@ -110,7 +110,7 @@ describe MainWindow::SnipersTableModel do
     assert_equal snapshot.item_id, cell_value(row, Column::ITEM_IDENTIFIER)
     assert_equal snapshot.last_price, cell_value(row, Column::LAST_PRICE)
     assert_equal snapshot.last_bid, cell_value(row, Column::LAST_BID)
-    assert_equal MainWindow::SnipersTableModel.text_for(snapshot.state), cell_value(row, Column::SNIPER_STATE)
+    assert_equal SnipersTableModel.text_for(snapshot.state), cell_value(row, Column::SNIPER_STATE)
   end
 
   def cell_value(row_index, column)

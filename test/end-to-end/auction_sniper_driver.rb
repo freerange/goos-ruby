@@ -54,7 +54,7 @@ class AuctionSniperDriver < JFrameDriver
 
   def start_bidding_for(item_id, stop_price)
     text_field(MainWindow::NEW_ITEM_ID_NAME).replaceAllText(item_id)
-    text_field(MainWindow::NEW_ITEM_STOP_PRICE_NAME).replaceAllText(String.valueOf(stop_price))
+    text_field(MainWindow::NEW_ITEM_STOP_PRICE_NAME).replaceAllText(java.lang.String.valueOf(stop_price))
     bid_button.click
   end
 

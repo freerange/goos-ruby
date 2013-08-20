@@ -4,17 +4,16 @@ require "ui/main_window"
 require "ui/column"
 require "sniper_snapshot"
 require "sniper_state"
+require "auction_sniper"
 
 java_import javax.swing.event.TableModelEvent
 
 describe MainWindow::SnipersTableModel do
-  ITEM_ID = "item 0"
-
   before do
     @listener = mock("TableModelListener")
     @model = MainWindow::SnipersTableModel.new
     @model.addTableModelListener(@listener)
-    @sniper = AuctionSniper.new(ITEM_ID, nil); 
+    @sniper = AuctionSniper.new("item 0", nil); 
   end
 
   it "has enough columns" do
@@ -30,17 +29,17 @@ describe MainWindow::SnipersTableModel do
   it "notifies listeners when adding a sniper" do
     @listener.expects(:tableChanged).with(&an_insertion_at_row(0))
     assert_equal 0, @model.getRowCount
-    @model.add_sniper(@sniper)
+    @model.sniper_added(@sniper)
     assert_equal 1, @model.getRowCount
-    assert_row_matches_snapshot(0, SniperSnapshot.joining(ITEM_ID))
+    assert_row_matches_snapshot(0, SniperSnapshot.joining("item 0"))
   end
 
   it "holds snipers in addition order" do
     sniper2 = AuctionSniper.new("item 1", nil)
     @listener.stubs(:tableChanged)
-    @model.add_sniper(@sniper)
-    @model.add_sniper(sniper2)
-    assert_equal ITEM_ID, cell_value(0, Column::ITEM_IDENTIFIER)
+    @model.sniper_added(@sniper)
+    @model.sniper_added(sniper2)
+    assert_equal "item 0", cell_value(0, Column::ITEM_IDENTIFIER)
     assert_equal "item 1", cell_value(1, Column::ITEM_IDENTIFIER)
   end
 
@@ -48,8 +47,8 @@ describe MainWindow::SnipersTableModel do
     sniper2 = AuctionSniper.new("item 1", nil)
     @listener.stubs(:tableChanged).with(&any_insertion_event)
     @listener.expects(:tableChanged).with(&a_change_in_row(1))
-    @model.add_sniper(@sniper)
-    @model.add_sniper(sniper2)
+    @model.sniper_added(@sniper)
+    @model.sniper_added(sniper2)
     winning_2 = sniper2.snapshot.winning(123)
     @model.sniper_state_changed(winning_2)
     assert_row_matches_snapshot(1, winning_2)
@@ -65,7 +64,7 @@ describe MainWindow::SnipersTableModel do
     bidding = @sniper.snapshot.bidding(555, 666)
     @listener.stubs(:tableChanged).with(&any_insertion_event)
     @listener.expects(:tableChanged).with(&a_change_in_row(0))
-    @model.add_sniper(@sniper)
+    @model.sniper_added(@sniper)
     @model.sniper_state_changed(bidding)
     assert_row_matches_snapshot(0, bidding)
   end

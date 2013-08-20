@@ -9,6 +9,7 @@ java_import javax.swing.SwingUtilities
 require "ui/main_window"
 require "xmpp_auction_house"
 require "sniper_launcher"
+require "sniper_portfolio"
 
 class Main
   ARG_HOSTNAME = 0
@@ -17,6 +18,7 @@ class Main
   ARG_ITEM_ID = 3
 
   def initialize
+    @portfolio = SniperPortfolio.new
     start_user_interface
   end
 
@@ -36,15 +38,14 @@ class Main
   end
 
   def add_user_request_listener_for(auction_house)
-    @ui.add_user_request_listener(SniperLauncher.new(auction_house, @snipers))
+    @ui.add_user_request_listener(SniperLauncher.new(auction_house, @portfolio))
   end
 
   private
 
   def start_user_interface
-    @snipers = MainWindow::SnipersTableModel.new
     SwingUtilities.invokeAndWait do
-      @ui = MainWindow.new(@snipers)
+      @ui = MainWindow.new(@portfolio)
     end
   end
 end

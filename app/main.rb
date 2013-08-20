@@ -8,7 +8,7 @@ java_import javax.swing.SwingUtilities
 
 require "ui/main_window"
 require "auction_sniper"
-require "xmpp_auction"
+require "xmpp_auction_house"
 
 class Main
   ARG_HOSTNAME = 0
@@ -34,42 +34,35 @@ class Main
 
   def self.main(*args)
     main = Main.new
-    connection = connection(args[ARG_HOSTNAME], args[ARG_USERNAME], args[ARG_PASSWORD]);
-    main.disconnect_when_ui_closes(connection)
-    main.add_user_request_listener_for(connection)
+    auction_house = XMPPAuctionHouse.connect(args[ARG_HOSTNAME], args[ARG_USERNAME], args[ARG_PASSWORD])
+    main.disconnect_when_ui_closes(auction_house)
+    main.add_user_request_listener_for(auction_house)
   end
 
-  def self.connection(hostname, username, password)
-    connection = XMPPConnection.new(hostname)
-    connection.connect
-    connection.login(username, password, XMPPAuction::AUCTION_RESOURCE)
-    return connection
-  end
-
-  def disconnect_when_ui_closes(connection)
+  def disconnect_when_ui_closes(auction_house)
     @ui.addWindowListener do |event|
       if event.paramString[/WINDOW_CLOSED/]
-        connection.disconnect
+        auction_house.disconnect
       end
     end
   end
 
-  def add_user_request_listener_for(connection)
+  def add_user_request_listener_for(auction_house)
     @ui.add_user_request_listener(
       Class.new do
-        def initialize(connection, snipers)
-          @connection, @snipers = connection, snipers
+        def initialize(auction_house, snipers)
+          @auction_house, @snipers = auction_house, snipers
           @not_to_be_garbage_collected = []
         end
 
         def join_auction(item_id)
           @snipers.add_sniper(SniperSnapshot.joining(item_id))
-          auction = XMPPAuction.new(@connection, item_id)
+          auction = @auction_house.auction_for(item_id)
           @not_to_be_garbage_collected << auction
           auction.add_auction_event_listener(AuctionSniper.new(item_id, auction, SwingThreadSniperListener.new(@snipers)))
           auction.join
         end
-      end.new(connection, @snipers)
+      end.new(auction_house, @snipers)
     )
   end
 

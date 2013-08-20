@@ -1,4 +1,5 @@
 require "main"
+require "ui/snipers_table_model"
 require "end-to-end/fake_auction_server"
 require "end-to-end/auction_sniper_driver"
 
@@ -12,24 +13,24 @@ class ApplicationRunner
     auctions.each do |auction|
       item_id = auction.item_id
       @driver.start_bidding_for(item_id)
-      @driver.shows_sniper_status(item_id, 0, 0, MainWindow::SnipersTableModel.text_for(SniperState::JOINING))
+      @driver.shows_sniper_status(item_id, 0, 0, SnipersTableModel.text_for(SniperState::JOINING))
     end
   end
 
   def has_shown_sniper_is_bidding(auction, last_price, last_bid)
-    @driver.shows_sniper_status(auction.item_id, last_price, last_bid, MainWindow::SnipersTableModel.text_for(SniperState::BIDDING))
+    @driver.shows_sniper_status(auction.item_id, last_price, last_bid, SnipersTableModel.text_for(SniperState::BIDDING))
   end
 
   def shows_sniper_has_lost_auction(auction, last_price, last_bid)
-    @driver.shows_sniper_status(auction.item_id, last_price, last_bid, MainWindow::SnipersTableModel.text_for(SniperState::LOST))
+    @driver.shows_sniper_status(auction.item_id, last_price, last_bid, SnipersTableModel.text_for(SniperState::LOST))
   end
 
   def has_shown_sniper_is_winning(auction, winning_bid)
-    @driver.shows_sniper_status(auction.item_id, winning_bid, winning_bid, MainWindow::SnipersTableModel.text_for(SniperState::WINNING))
+    @driver.shows_sniper_status(auction.item_id, winning_bid, winning_bid, SnipersTableModel.text_for(SniperState::WINNING))
   end
 
   def shows_sniper_has_won_auction(auction, last_price)
-    @driver.shows_sniper_status(auction.item_id, last_price, last_price, MainWindow::SnipersTableModel.text_for(SniperState::WON))
+    @driver.shows_sniper_status(auction.item_id, last_price, last_price, SnipersTableModel.text_for(SniperState::WON))
   end
 
   def stop

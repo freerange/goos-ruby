@@ -1,4 +1,4 @@
-require "ui/main_window"
+require "ui/snipers_table_model"
 
 class Column < Struct.new(:name)
 
@@ -20,7 +20,7 @@ class Column < Struct.new(:name)
   end
 
   def SNIPER_STATE.value_in(snapshot)
-    MainWindow::SnipersTableModel.text_for(snapshot.state)
+    SnipersTableModel.text_for(snapshot.state)
   end
 
   def ordinal

@@ -7,7 +7,6 @@ java_import org.jivesoftware.smack.packet.Message
 java_import javax.swing.SwingUtilities
 
 require "ui/main_window"
-require "auction_message_translator"
 require "auction_sniper"
 require "xmpp_auction"
 
@@ -16,10 +15,6 @@ class Main
   ARG_USERNAME = 1
   ARG_PASSWORD = 2
   ARG_ITEM_ID = 3
-
-  AUCTION_RESOURCE = "Auction"
-  ITEM_ID_AS_LOGIN = "auction-%s"
-  AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE
 
   class SwingThreadSniperListener
     def initialize(snipers)
@@ -47,7 +42,7 @@ class Main
   def self.connection(hostname, username, password)
     connection = XMPPConnection.new(hostname)
     connection.connect
-    connection.login(username, password, AUCTION_RESOURCE)
+    connection.login(username, password, XMPPAuction::AUCTION_RESOURCE)
     return connection
   end
 
@@ -69,25 +64,10 @@ class Main
 
         def join_auction(item_id)
           @snipers.add_sniper(SniperSnapshot.joining(item_id))
-          chat = @connection.getChatManager.createChat(auction_id(item_id, @connection), nil)
-          auction_event_listeners = Announcer.new
-          chat.addMessageListener(
-            AuctionMessageTranslator.new(
-              @connection.getUser,
-              auction_event_listeners.announce
-            )
-          )
-          @not_to_be_garbage_collected << chat
-
-          auction = XMPPAuction.new(chat)
-          auction_event_listeners.add_listener(AuctionSniper.new(item_id, auction, SwingThreadSniperListener.new(@snipers)))
+          auction = XMPPAuction.new(@connection, item_id)
+          @not_to_be_garbage_collected << auction
+          auction.add_auction_event_listener(AuctionSniper.new(item_id, auction, SwingThreadSniperListener.new(@snipers)))
           auction.join
-        end
-
-        private
-
-        def auction_id(item_id, connection)
-          format(AUCTION_ID_FORMAT, item_id, connection.getServiceName)
         end
       end.new(connection, @snipers)
     )

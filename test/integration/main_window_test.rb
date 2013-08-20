@@ -5,12 +5,12 @@ java_import com.objogate.wl.swing.probe.ValueMatcherProbe
 java_import org.hamcrest.Matchers
 
 require "ui/main_window"
+require "sniper_portfolio"
 require "end-to-end/auction_sniper_driver"
 
 describe MainWindow do
   before do
-    @table_model = MainWindow::SnipersTableModel.new
-    @main_window = MainWindow.new(@table_model)
+    @main_window = MainWindow.new(SniperPortfolio.new)
     @driver = AuctionSniperDriver.new(100)
   end
 

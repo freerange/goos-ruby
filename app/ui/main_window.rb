@@ -30,7 +30,6 @@ class MainWindow < JFrame
     def initialize
       super
       @snapshots = []
-      @not_to_be_garbage_collected = []
     end
 
     def getColumnCount
@@ -62,8 +61,7 @@ class MainWindow < JFrame
       STATUS_TEXT[state.ordinal]
     end
 
-    def add_sniper(sniper)
-      @not_to_be_garbage_collected << sniper
+    def sniper_added(sniper)
       add_sniper_snapshot(sniper.snapshot)
       sniper.add_sniper_listener(SwingThreadSniperListener.new(self))
     end
@@ -77,12 +75,11 @@ class MainWindow < JFrame
     end
   end
 
-  def initialize(snipers)
+  def initialize(portfolio)
     super(APPLICATION_TITLE)
     setName(MAIN_WINDOW_NAME)
-    @snipers = snipers
     @user_requests = Announcer.new
-    fill_content_pane(make_snipers_table, make_controls)
+    fill_content_pane(make_snipers_table(portfolio), make_controls)
     pack
     setDefaultCloseOperation(JFrame::EXIT_ON_CLOSE)
     setVisible(true)
@@ -101,8 +98,10 @@ class MainWindow < JFrame
     content_pane.add(JScrollPane.new(snipers_table), BorderLayout::CENTER)
   end
 
-  def make_snipers_table
-    snipers_table = JTable.new(@snipers)
+  def make_snipers_table(portfolio)
+    model = SnipersTableModel.new
+    portfolio.add_portfolio_listener(model)
+    snipers_table = JTable.new(model)
     snipers_table.setName(SNIPERS_TABLE_NAME)
     return snipers_table
   end

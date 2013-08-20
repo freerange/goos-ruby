@@ -8,10 +8,13 @@ require "sniper_state"
 java_import javax.swing.event.TableModelEvent
 
 describe MainWindow::SnipersTableModel do
+  ITEM_ID = "item 0"
+
   before do
     @listener = mock("TableModelListener")
     @model = MainWindow::SnipersTableModel.new
     @model.addTableModelListener(@listener)
+    @sniper = AuctionSniper.new(ITEM_ID, nil)
   end
 
   it "has enough columns" do
@@ -25,32 +28,31 @@ describe MainWindow::SnipersTableModel do
   end
 
   it "notifies listeners when adding a sniper" do
-    joining = SniperSnapshot.joining("item123")
     @listener.expects(:tableChanged).with(&an_insertion_at_row(0))
     assert_equal 0, @model.getRowCount
-    @model.add_sniper(joining)
+    @model.add_sniper(@sniper)
     assert_equal 1, @model.getRowCount
-    assert_row_matches_snapshot(0, joining)
+    assert_row_matches_snapshot(0, SniperSnapshot.joining(ITEM_ID))
   end
 
   it "holds snipers in addition order" do
+    sniper2 = AuctionSniper.new("item 1", nil)
     @listener.stubs(:tableChanged)
-    @model.add_sniper(SniperSnapshot.joining("item 0"))
-    @model.add_sniper(SniperSnapshot.joining("item 1"))
-    assert_equal "item 0", cell_value(0, Column::ITEM_IDENTIFIER)
+    @model.add_sniper(@sniper)
+    @model.add_sniper(sniper2)
+    assert_equal ITEM_ID, cell_value(0, Column::ITEM_IDENTIFIER)
     assert_equal "item 1", cell_value(1, Column::ITEM_IDENTIFIER)
   end
 
   it "updates correct row for sniper" do
+    sniper2 = AuctionSniper.new("item 1", nil)
     @listener.stubs(:tableChanged).with(&any_insertion_event)
     @listener.expects(:tableChanged).with(&a_change_in_row(1))
-    sniper_0 = SniperSnapshot.joining("item 0")
-    sniper_1 = SniperSnapshot.joining("item 1")
-    @model.add_sniper(sniper_0)
-    @model.add_sniper(sniper_1)
-    winning_1 = sniper_1.winning(123)
-    @model.sniper_state_changed(winning_1)
-    assert_row_matches_snapshot(1, winning_1)
+    @model.add_sniper(@sniper)
+    @model.add_sniper(sniper2)
+    winning_2 = sniper2.snapshot.winning(123)
+    @model.sniper_state_changed(winning_2)
+    assert_row_matches_snapshot(1, winning_2)
   end
 
   it "raises exception if no existing sniper for an update" do
@@ -60,11 +62,10 @@ describe MainWindow::SnipersTableModel do
   end
 
   it "sets sniper values in columns" do
-    joining = SniperSnapshot.joining("item123")
-    bidding = joining.bidding(555, 666)
+    bidding = @sniper.snapshot.bidding(555, 666)
     @listener.stubs(:tableChanged).with(&any_insertion_event)
     @listener.expects(:tableChanged).with(&a_change_in_row(0))
-    @model.add_sniper(joining)
+    @model.add_sniper(@sniper)
     @model.sniper_state_changed(bidding)
     assert_row_matches_snapshot(0, bidding)
   end

@@ -1,11 +1,19 @@
 require "price_source"
 require "sniper_snapshot"
+require "announcer"
 
 class AuctionSniper
-  def initialize(item_id, auction, sniper_listener)
-    @item_id, @auction, @sniper_listener = item_id, auction, sniper_listener
+  attr_reader :snapshot
+
+  def initialize(item_id, auction)
+    @item_id, @auction = item_id, auction
     @is_winning = false
     @snapshot = SniperSnapshot.joining(item_id)
+    @listeners = Announcer.new
+  end
+
+  def add_sniper_listener(sniper_listener)
+    @listeners.add_listener(sniper_listener)
   end
 
   def current_price(price, increment, price_source)
@@ -28,6 +36,6 @@ class AuctionSniper
   private
 
   def notify_change
-    @sniper_listener.sniper_state_changed(@snapshot)
+    @listeners.announce.sniper_state_changed(@snapshot)
   end
 end

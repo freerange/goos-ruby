@@ -11,7 +11,8 @@ describe AuctionSniper do
   before do
     @auction = mock("Auction")
     @sniper_listener = mock("SniperListener")
-    @sniper = AuctionSniper.new(ITEM_ID, @auction, @sniper_listener)
+    @sniper = AuctionSniper.new(ITEM_ID, @auction)
+    @sniper.add_sniper_listener(@sniper_listener)
     @sniper_state = states("sniper")
   end
 

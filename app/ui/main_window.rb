@@ -12,6 +12,7 @@ java_import java.awt.BorderLayout
 java_import java.awt.FlowLayout
 
 require "ui/column"
+require "ui/swing_thread_sniper_listener"
 require "sniper_snapshot"
 require "announcer"
 
@@ -29,6 +30,7 @@ class MainWindow < JFrame
     def initialize
       super
       @snapshots = []
+      @not_to_be_garbage_collected = []
     end
 
     def getColumnCount
@@ -60,7 +62,15 @@ class MainWindow < JFrame
       STATUS_TEXT[state.ordinal]
     end
 
-    def add_sniper(snapshot)
+    def add_sniper(sniper)
+      @not_to_be_garbage_collected << sniper
+      add_sniper_snapshot(sniper.snapshot)
+      sniper.add_sniper_listener(SwingThreadSniperListener.new(self))
+    end
+
+    private
+
+    def add_sniper_snapshot(snapshot)
       @snapshots << snapshot
       row = @snapshots.length - 1
       fireTableRowsInserted(row, row)

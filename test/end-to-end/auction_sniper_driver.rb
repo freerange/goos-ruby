@@ -52,15 +52,16 @@ class AuctionSniperDriver < JFrameDriver
     ))
   end
 
-  def start_bidding_for(item_id)
-    item_id_field.replaceAllText(item_id)
+  def start_bidding_for(item_id, stop_price)
+    text_field(MainWindow::NEW_ITEM_ID_NAME).replaceAllText(item_id)
+    text_field(MainWindow::NEW_ITEM_STOP_PRICE_NAME).replaceAllText(stop_price.to_s)
     bid_button.click
   end
 
-  def item_id_field
-    new_item_id = JTextFieldDriver.new(self, JTextField.java_class, ComponentDriver.named(MainWindow::NEW_ITEM_ID_NAME))
-    new_item_id.focusWithMouse
-    return new_item_id
+  def text_field(name)
+    driver = JTextFieldDriver.new(self, JTextField.java_class, ComponentDriver.named(name))
+    driver.focusWithMouse
+    return driver
   end
 
   def bid_button

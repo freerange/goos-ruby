@@ -20,6 +20,7 @@ class MainWindow < JFrame
   SNIPERS_TABLE_NAME = "Snipers Table"
   NEW_ITEM_ID_NAME = "item id"
   JOIN_BUTTON_NAME = "join button"
+  NEW_ITEM_STOP_PRICE_NAME = "stop price"
 
   def initialize(portfolio)
     super(APPLICATION_TITLE)

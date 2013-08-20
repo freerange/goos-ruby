@@ -1,6 +1,7 @@
 class SniperState < Struct.new(:name)
   JOINING = new("JOINING")
   BIDDING = new("BIDDING")
+  LOSING = new("LOSING")
   WINNING = new("WINNING")
   LOST = new("LOST")
   WON = new("WON")
@@ -11,6 +12,7 @@ class SniperState < Struct.new(:name)
 
   def JOINING.when_auction_closed; LOST; end
   def BIDDING.when_auction_closed; LOST; end
+  def LOSING.when_auction_closed; LOST; end
   def WINNING.when_auction_closed; WON; end
 
   def when_auction_closed
@@ -19,7 +21,7 @@ class SniperState < Struct.new(:name)
 
   class << self
     def values
-      [JOINING, BIDDING, WINNING, LOST, WON]
+      [JOINING, BIDDING, WINNING, LOSING, LOST, WON]
     end
   end
 end

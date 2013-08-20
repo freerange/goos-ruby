@@ -68,4 +68,19 @@ describe AuctionSniper do
     @application.shows_sniper_has_won_auction(@auction, 1098)
     @application.shows_sniper_has_won_auction(@auction2, 521)
   end
+
+  it "sniper loses an auction when the price is too high" do
+    @auction.start_selling_item
+    @application.start_bidding_with_stop_price(@auction, 1100)
+    @auction.has_received_join_request_from(ApplicationRunner::SNIPER_XMPP_ID)
+    @auction.report_price(1000, 98, "other bidder")
+    @application.has_shown_sniper_is_bidding(@auction, 1000, 1098)
+    @auction.has_received_bid(1098, ApplicationRunner::SNIPER_XMPP_ID)
+    @auction.report_price(1197, 10, "third party")
+    @application.has_shown_sniper_is_losing(@auction, 1197, 1098)
+    @auction.report_price(1207, 10, "fourth party")
+    @application.has_shown_sniper_is_losing(@auction, 1207, 1098)
+    @auction.announce_closed
+    @application.shows_sniper_has_lost_auction(@auction, 1207, 1098)
+  end
 end

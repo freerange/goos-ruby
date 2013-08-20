@@ -3,22 +3,26 @@ require "test_helper"
 java_import java.util.concurrent.CountDownLatch
 java_import java.util.concurrent.TimeUnit
 
-require "main"
-require "xmpp_auction"
+require "xmpp_auction_house"
 require "announcer"
 require "end-to-end/fake_auction_server"
 require "end-to-end/application_runner"
 
-describe XMPPAuction do
+describe XMPPAuctionHouse do
   before do
     @auction_server = FakeAuctionServer.new("item-54321")
-    @connection = Main.connection(FakeAuctionServer::XMPP_HOSTNAME, ApplicationRunner::SNIPER_ID, ApplicationRunner::SNIPER_PASSWORD)
+    @auction_server.start_selling_item
+    @auction_house = XMPPAuctionHouse.connect(FakeAuctionServer::XMPP_HOSTNAME, ApplicationRunner::SNIPER_ID, ApplicationRunner::SNIPER_PASSWORD)
+  end
+
+  after do
+    @auction_house.disconnect
+    @auction_server.stop
   end
 
   it "receives events from auction server after joining" do
-    @auction_server.start_selling_item
     auction_was_closed = CountDownLatch.new(1)
-    auction = XMPPAuction.new(@connection, @auction_server.item_id)
+    auction = @auction_house.auction_for(@auction_server.item_id)
     auction.add_auction_event_listener(auction_closed_listener(auction_was_closed))
     auction.join
     @auction_server.has_received_join_request_from(ApplicationRunner::SNIPER_XMPP_ID)

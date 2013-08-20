@@ -5,14 +5,10 @@ class XMPPAuction
   JOIN_COMMAND_FORMAT = "SQLVersion: 1.1; Command: JOIN;"
   BID_COMMAND_FORMAT = "SQLVersion: 1.1; Command: BID; Price: %d;"
 
-  AUCTION_RESOURCE = "Auction"
-  ITEM_ID_AS_LOGIN = "auction-%s"
-  AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE
-
-  def initialize(connection, item_id)
+  def initialize(connection, auction_id)
     @auction_event_listeners = Announcer.new
     @chat = connection.getChatManager.createChat(
-      auction_id(item_id, connection),
+      auction_id,
       AuctionMessageTranslator.new(
         connection.getUser,
         @auction_event_listeners.announce
@@ -38,9 +34,5 @@ class XMPPAuction
     @chat.sendMessage(message)
   rescue XMPPException => e
     puts %{\n#{e}\n#{e.backtrace.join("\n")}}
-  end
-
-  def auction_id(item_id, connection)
-    format(AUCTION_ID_FORMAT, item_id, connection.getServiceName)
   end
 end

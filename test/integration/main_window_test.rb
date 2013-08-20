@@ -21,19 +21,19 @@ describe MainWindow do
   end
 
   it "makes user request when join button clicked" do
-    button_probe = ValueMatcherProbe.new(org.hamcrest.Matchers.equalTo("an item-id"), "join request")
+    item_probe = ValueMatcherProbe.new(org.hamcrest.Matchers.equalTo(Item.new("an item-id", 789)), "join request")
     @main_window.add_user_request_listener(
       Class.new do
         def initialize(probe)
           @probe = probe
         end
 
-        def join_auction(item_id)
-          @probe.set_received_value(item_id)
+        def join_auction(item)
+          @probe.set_received_value(item)
         end
-      end.new(button_probe)
+      end.new(item_probe)
     )
     @driver.start_bidding_for("an item-id", 789)
-    @driver.check(button_probe)
+    @driver.check(item_probe)
   end
 end

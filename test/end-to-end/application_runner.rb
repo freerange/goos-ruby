@@ -10,11 +10,12 @@ class ApplicationRunner
 
   def start_bidding_in(*auctions)
     start_sniper
-    auctions.each do |auction|
-      item_id = auction.item_id
-      @driver.start_bidding_for(item_id)
-      @driver.shows_sniper_status(item_id, 0, 0, SnipersTableModel.text_for(SniperState::JOINING))
-    end
+    auctions.each { |a| open_bidding_for(a, java.lang.Integer::MAX_VALUE) }
+  end
+
+  def start_bidding_with_stop_price(auction, stop_price)
+    start_sniper
+    open_bidding_for(auction, stop_price)
   end
 
   def has_shown_sniper_is_bidding(auction, last_price, last_bid)
@@ -23,6 +24,10 @@ class ApplicationRunner
 
   def shows_sniper_has_lost_auction(auction, last_price, last_bid)
     @driver.shows_sniper_status(auction.item_id, last_price, last_bid, SnipersTableModel.text_for(SniperState::LOST))
+  end
+
+  def has_shown_sniper_is_losing(auction, last_price, last_bid)
+    @driver.shows_sniper_status(auction.item_id, last_price, last_bid, SnipersTableModel.text_for(SniperState::LOSING))
   end
 
   def has_shown_sniper_is_winning(auction, winning_bid)
@@ -56,5 +61,11 @@ class ApplicationRunner
     @driver = AuctionSniperDriver.new(1000)
     @driver.hasTitle(MainWindow::APPLICATION_TITLE)
     @driver.has_column_titles
+  end
+
+  def open_bidding_for(auction, stop_price)
+    item_id = auction.item_id
+    @driver.start_bidding_for(item_id, stop_price)
+    @driver.shows_sniper_status(item_id, 0, 0, SnipersTableModel.text_for(SniperState::JOINING))
   end
 end

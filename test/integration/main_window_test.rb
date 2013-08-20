@@ -33,7 +33,7 @@ describe MainWindow do
         end
       end.new(button_probe)
     )
-    @driver.start_bidding_for("an item-id")
+    @driver.start_bidding_for("an item-id", 789)
     @driver.check(button_probe)
   end
 end

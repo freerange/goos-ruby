@@ -38,6 +38,13 @@ class ApplicationRunner
     @driver.shows_sniper_status(auction.item_id, last_price, last_price, SnipersTableModel.text_for(SniperState::WON))
   end
 
+  def shows_sniper_has_failed(auction)
+    @driver.shows_sniper_status(auction.item_id, 0, 0, SnipersTableModel.text_for(SniperState::FAILED))
+  end
+
+  def reports_invalid_message(auction, broken_message)
+  end
+
   def stop
     unless @driver.nil?
       @driver.dispose

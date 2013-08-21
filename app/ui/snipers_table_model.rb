@@ -4,7 +4,7 @@ require "ui/column"
 require "ui/swing_thread_sniper_listener"
 
 class SnipersTableModel < AbstractTableModel
-  STATUS_TEXT = %w(joining bidding winning losing won lost)
+  STATUS_TEXT = %w(joining bidding winning losing won lost failed)
 
   def initialize
     super

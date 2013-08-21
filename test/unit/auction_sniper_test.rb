@@ -4,6 +4,7 @@ require "auction_sniper"
 require "price_source"
 require "sniper_snapshot"
 require "sniper_state"
+require "item"
 
 describe AuctionSniper do
   ITEM_ID = "item-id"
@@ -11,7 +12,8 @@ describe AuctionSniper do
   before do
     @auction = mock("Auction")
     @sniper_listener = mock("SniperListener")
-    @sniper = AuctionSniper.new(ITEM_ID, @auction)
+    @item = Item.new(ITEM_ID, 1234)
+    @sniper = AuctionSniper.new(@item, @auction)
     @sniper.add_sniper_listener(@sniper_listener)
     @sniper_state = states("sniper")
   end

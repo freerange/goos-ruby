@@ -5,10 +5,10 @@ require "announcer"
 class AuctionSniper
   attr_reader :snapshot
 
-  def initialize(item_id, auction)
-    @item_id, @auction = item_id, auction
+  def initialize(item, auction)
+    @item, @auction = item, auction
     @is_winning = false
-    @snapshot = SniperSnapshot.joining(item_id)
+    @snapshot = SniperSnapshot.joining(item.identifier)
     @listeners = Announcer.new
   end
 

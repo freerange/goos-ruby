@@ -18,8 +18,8 @@ class XMPPAuctionHouse
     @connection = connection
   end
 
-  def auction_for(item_id)
-    XMPPAuction.new(@connection, auction_id(item_id, @connection))
+  def auction_for(item)
+    XMPPAuction.new(@connection, auction_id(item.identifier, @connection))
   end
 
   def disconnect

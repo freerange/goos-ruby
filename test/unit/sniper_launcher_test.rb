@@ -1,6 +1,7 @@
 require "test_helper"
 
 require "sniper_launcher"
+require "item"
 
 describe SniperLauncher do
   before do
@@ -12,12 +13,12 @@ describe SniperLauncher do
   end
 
   it "adds new sniper to collector and then joins auction" do
-    item_id = "item 123"
-    @auction_house.stubs(:auction_for).with(item_id).returns(@auction)
-    @auction.expects(:add_auction_event_listener).with(&sniper_for_item(item_id)).when(@auction_state.is("not joined"))
-    @sniper_collector.expects(:add_sniper).with(&sniper_for_item(item_id)).when(@auction_state.is("not joined"))
+    item = Item.new("item 123", 456)
+    @auction_house.stubs(:auction_for).with(item).returns(@auction)
+    @auction.expects(:add_auction_event_listener).with(&sniper_for_item(item.identifier)).when(@auction_state.is("not joined"))
+    @sniper_collector.expects(:add_sniper).with(&sniper_for_item(item.identifier)).when(@auction_state.is("not joined"))
     @auction.stubs(:join).then(@auction_state.is("joined"))
-    @launcher.join_auction(item_id)
+    @launcher.join_auction(item)
   end
 
   private

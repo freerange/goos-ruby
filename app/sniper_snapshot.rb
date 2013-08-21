@@ -13,6 +13,10 @@ class SniperSnapshot < Struct.new(:item_id, :last_price, :last_bid, :state)
     SniperSnapshot.new(item_id, new_last_price, last_bid, SniperState::WINNING)
   end
 
+  def losing(new_last_price)
+    SniperSnapshot.new(item_id, new_last_price, last_bid, SniperState::LOSING)
+  end
+
   def closed
     SniperSnapshot.new(item_id, last_price, last_bid, state.when_auction_closed)
   end

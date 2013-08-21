@@ -52,6 +52,10 @@ class FakeAuctionServer
     end
   end
 
+  def send_invalid_message_containing(broken_message)
+    @current_chat.sendMessage(broken_message)
+  end
+
   def report_price(price, increment, bidder)
     @current_chat.sendMessage(format("SQLVersion: 1.1; Event: PRICE; CurrentPrice: %d; Increment: %d; Bidder: %s;", price, increment, bidder))
   end

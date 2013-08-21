@@ -5,6 +5,7 @@ class SniperState < Struct.new(:name)
   WINNING = new("WINNING")
   LOST = new("LOST")
   WON = new("WON")
+  FAILED = new("FAILED")
 
   def ordinal
     return self.class.values.index(self)
@@ -21,7 +22,7 @@ class SniperState < Struct.new(:name)
 
   class << self
     def values
-      [JOINING, BIDDING, WINNING, LOSING, LOST, WON]
+      [JOINING, BIDDING, WINNING, LOSING, LOST, WON, FAILED]
     end
   end
 end

@@ -5,6 +5,7 @@ require "ui/column"
 require "sniper_snapshot"
 require "sniper_state"
 require "auction_sniper"
+require "item"
 
 java_import javax.swing.event.TableModelEvent
 
@@ -13,7 +14,7 @@ describe SnipersTableModel do
     @listener = mock("TableModelListener")
     @model = SnipersTableModel.new
     @model.addTableModelListener(@listener)
-    @sniper = AuctionSniper.new("item 0", nil); 
+    @sniper = AuctionSniper.new(Item.new("item 0", 234), nil); 
   end
 
   it "has enough columns" do
@@ -35,7 +36,7 @@ describe SnipersTableModel do
   end
 
   it "holds snipers in addition order" do
-    sniper2 = AuctionSniper.new("item 1", nil)
+    sniper2 = AuctionSniper.new(Item.new("item 1", 345), nil)
     @listener.stubs(:tableChanged)
     @model.sniper_added(@sniper)
     @model.sniper_added(sniper2)
@@ -44,7 +45,7 @@ describe SnipersTableModel do
   end
 
   it "updates correct row for sniper" do
-    sniper2 = AuctionSniper.new("item 1", nil)
+    sniper2 = AuctionSniper.new(Item.new("item 1", 345), nil)
     @listener.stubs(:tableChanged).with(&any_insertion_event)
     @listener.expects(:tableChanged).with(&a_change_in_row(1))
     @model.sniper_added(@sniper)

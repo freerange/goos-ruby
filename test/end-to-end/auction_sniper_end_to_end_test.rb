@@ -69,7 +69,7 @@ describe AuctionSniper do
     @application.shows_sniper_has_won_auction(@auction2, 521)
   end
 
-  it "sniper loses an auction when the price is too high" do
+  it "loses an auction when the price is too high" do
     @auction.start_selling_item
     @application.start_bidding_with_stop_price(@auction, 1100)
     @auction.has_received_join_request_from(ApplicationRunner::SNIPER_XMPP_ID)

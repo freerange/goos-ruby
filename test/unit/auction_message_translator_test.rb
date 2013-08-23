@@ -38,4 +38,20 @@ describe AuctionMessageTranslator do
     message.setBody("SQLVersion: 1.1; Event: PRICE; CurrentPrice: 234; Increment: 5; Bidder: #{SNIPER_ID};" )
     @translator.processMessage(UNUSED_CHAT, message)
   end
+
+  it "notifies auction failed when bad message received" do
+    @listener.expects(:auction_failed).once
+
+    message = Message.new
+    message.setBody("a bad message")
+    @translator.processMessage(UNUSED_CHAT, message)
+  end
+
+  it "notifies auction failed when event type missing" do
+    @listener.expects(:auction_failed).once
+
+    message = Message.new
+    message.setBody("SOLVersion: 1.1; CurrentPrice: 234; Increment: 5; Bidder: #{SNIPER_ID};")
+    @translator.processMessage(UNUSED_CHAT, message)
+  end
 end

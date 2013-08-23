@@ -62,7 +62,14 @@ class AuctionMessageTranslator
   end
 
   def processMessage(chat, message)
-    event = AuctionEvent.from(message.getBody)
+    message_body = message.getBody
+    translate(message_body)
+  rescue => parse_exception
+    @listener.auction_failed
+  end
+
+  def translate(message_body)
+    event = AuctionEvent.from(message_body)
     event_type = event.type
     if "CLOSE" == event_type
       @listener.auction_closed

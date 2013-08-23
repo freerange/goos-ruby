@@ -78,7 +78,7 @@ describe AuctionSniper do
   end
 
   it "reports lost if auction closes when bidding" do
-    @auction.stub_everything
+    ignoring_auction
     allowing_sniper_bidding
     @sniper_listener.expects(:sniper_state_changed).with(&a_sniper_that_is(SniperState::LOST)).at_least_once.when(@sniper_state.is("bidding"))
 
@@ -96,7 +96,7 @@ describe AuctionSniper do
   end
 
   it "reports is winning when current price comes from sniper" do
-    @auction.stub_everything
+    ignoring_auction
     allowing_sniper_bidding
     winning_snapshot = SniperSnapshot.new(ITEM_ID, 135, 135, SniperState::WINNING)
     @sniper_listener.expects(:sniper_state_changed).with(winning_snapshot).at_least_once.when(@sniper_state.is("bidding"))
@@ -106,7 +106,7 @@ describe AuctionSniper do
   end
 
   it "reports won if auction closes when winning" do
-    @auction.stub_everything
+    ignoring_auction
     allowing_sniper_winning
     @sniper_listener.expects(:sniper_state_changed).with(&a_sniper_that_is(SniperState::WON)).at_least_once.when(@sniper_state.is("winning"))
 
@@ -114,7 +114,46 @@ describe AuctionSniper do
     @sniper.auction_closed
   end
 
+  it "reports failed if auction fails when bidding" do
+    ignoring_auction
+    allowing_sniper_bidding
+    expect_sniper_to_fail_when_it_is("bidding")
+
+    @sniper.current_price(123, 45, PriceSource::FROM_OTHER_BIDDER)
+    @sniper.auction_failed
+  end
+
+  it "reports failed if auction fails immediately" do
+    failed_snapshot = SniperSnapshot.joining(ITEM_ID).failed
+    @sniper_listener.expects(:sniper_state_changed).with(failed_snapshot).at_least_once
+
+    @sniper.auction_failed
+  end
+
+  it "reports failed if auction fails when losing" do
+    allowing_sniper_losing
+    expect_sniper_to_fail_when_it_is("losing")
+
+    @sniper.current_price(1230, 456, PriceSource::FROM_OTHER_BIDDER)
+    @sniper.auction_failed
+  end
+
+  it "reports failed if auction fails when winning" do
+    ignoring_auction
+    allowing_sniper_bidding
+    allowing_sniper_winning
+    expect_sniper_to_fail_when_it_is("winning")
+
+    @sniper.current_price(123, 12, PriceSource::FROM_OTHER_BIDDER)
+    @sniper.current_price(135, 45, PriceSource::FROM_SNIPER)
+    @sniper.auction_failed
+  end
+
   private
+
+  def ignoring_auction
+    @auction.stub_everything
+  end
 
   def allowing_sniper_bidding
     allow_sniper_state_change(SniperState::BIDDING, "bidding")
@@ -130,6 +169,11 @@ describe AuctionSniper do
 
   def allow_sniper_state_change(new_state, old_state)
     @sniper_listener.stubs(:sniper_state_changed).with(&a_sniper_that_is(new_state)).then(@sniper_state.is(old_state))
+  end
+
+  def expect_sniper_to_fail_when_it_is(state)
+    failed_snapshot = SniperSnapshot.new(ITEM_ID, 0, 0, SniperState::FAILED)
+    @sniper_listener.expects(:sniper_state_changed).with(failed_snapshot).at_least_once.when(@sniper_state.is(state))
   end
 
   def a_sniper_that_is(expected_state)

@@ -7,13 +7,9 @@ class XMPPAuction
 
   def initialize(connection, auction_id)
     @auction_event_listeners = Announcer.new
-    @chat = connection.getChatManager.createChat(
-      auction_id,
-      AuctionMessageTranslator.new(
-        connection.getUser,
-        @auction_event_listeners.announce
-      )
-    )
+    translator = translator_for(connection)
+    @chat = connection.getChatManager.createChat(auction_id, translator)
+    add_auction_event_listener(chat_disconnector_for(translator))
   end
 
   def bid(amount)
@@ -34,5 +30,24 @@ class XMPPAuction
     @chat.sendMessage(message)
   rescue XMPPException => e
     puts %{\n#{e}\n#{e.backtrace.join("\n")}}
+  end
+
+  def translator_for(connection)
+    AuctionMessageTranslator.new(connection.getUser, @auction_event_listeners.announce)
+  end
+
+  def chat_disconnector_for(translator)
+    Class.new do
+      def initialize(chat, translator)
+        @chat, @translator = chat, translator
+      end
+
+      def auction_failed
+        @chat.removeMessageListener(@translator)
+      end
+
+      def auction_closed; end
+      def current_price(price, increment, price_source); end
+    end.new(@chat, translator)
   end
 end

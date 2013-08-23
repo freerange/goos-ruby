@@ -38,6 +38,8 @@ class AuctionSniper
   end
 
   def auction_failed
+    @snapshot = @snapshot.failed
+    notify_change
   end
 
   private

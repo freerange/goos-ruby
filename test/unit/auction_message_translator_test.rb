@@ -12,46 +12,53 @@ describe AuctionMessageTranslator do
 
   before do
     @listener = mock("AuctionEventListener")
-    @translator = AuctionMessageTranslator.new(SNIPER_ID, @listener)
+    @failure_reporter = mock("XMPPFailureReporter")
+    @translator = AuctionMessageTranslator.new(SNIPER_ID, @listener, @failure_reporter)
   end
 
   it "notifies auction closed when close message received" do
     @listener.expects(:auction_closed)
 
-    message = Message.new
-    message.setBody("SQLVersion: 1.1; Event: CLOSE;")
-    @translator.processMessage(UNUSED_CHAT, message)
+    body = "SQLVersion: 1.1; Event: CLOSE;"
+    @translator.processMessage(UNUSED_CHAT, message(body))
   end
 
   it "notifies bid details when current price message received from other bidder" do
     @listener.expects(:current_price).with(192, 7, PriceSource::FROM_OTHER_BIDDER)
 
-    message = Message.new
-    message.setBody("SQLVersion: 1.1; Event: PRICE; CurrentPrice: 192; Increment: 7; Bidder: Someone else;" )
-    @translator.processMessage(UNUSED_CHAT, message)
+    body = "SQLVersion: 1.1; Event: PRICE; CurrentPrice: 192; Increment: 7; Bidder: Someone else;"
+    @translator.processMessage(UNUSED_CHAT, message(body))
   end
 
   it "notifies bid details when current price message received from sniper" do
     @listener.expects(:current_price).with(234, 5, PriceSource::FROM_SNIPER)
 
-    message = Message.new
-    message.setBody("SQLVersion: 1.1; Event: PRICE; CurrentPrice: 234; Increment: 5; Bidder: #{SNIPER_ID};" )
-    @translator.processMessage(UNUSED_CHAT, message)
+    body = "SQLVersion: 1.1; Event: PRICE; CurrentPrice: 234; Increment: 5; Bidder: #{SNIPER_ID};"
+    @translator.processMessage(UNUSED_CHAT, message(body))
   end
 
   it "notifies auction failed when bad message received" do
-    @listener.expects(:auction_failed).once
-
-    message = Message.new
-    message.setBody("a bad message")
-    @translator.processMessage(UNUSED_CHAT, message)
+    bad_message = "a bad message"
+    expect_failure_with_message(bad_message)
+    @translator.processMessage(UNUSED_CHAT, message(bad_message))
   end
 
   it "notifies auction failed when event type missing" do
-    @listener.expects(:auction_failed).once
+    body_without_type = "SOLVersion: 1.1; CurrentPrice: 234; Increment: 5; Bidder: #{SNIPER_ID};"
+    expect_failure_with_message(body_without_type)
+    @translator.processMessage(UNUSED_CHAT, message(body_without_type))
+  end
 
+  private
+
+  def message(body)
     message = Message.new
-    message.setBody("SOLVersion: 1.1; CurrentPrice: 234; Increment: 5; Bidder: #{SNIPER_ID};")
-    @translator.processMessage(UNUSED_CHAT, message)
+    message.setBody(body)
+    return message
+  end
+
+  def expect_failure_with_message(bad_message)
+    @listener.expects(:auction_failed).once
+    @failure_reporter.expects(:cannot_translate_message).with(SNIPER_ID, bad_message, kind_of(StandardError)).once
   end
 end

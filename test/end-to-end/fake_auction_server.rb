@@ -6,14 +6,12 @@ java_import org.jivesoftware.smack.packet.Message
 java_import java.util.concurrent.ArrayBlockingQueue
 java_import java.util.concurrent.TimeUnit
 
-java_import org.junit.Assert
-java_import org.hamcrest.Matchers
-
 require "xmpp_auction"
 
 class SingleMessageListener
   include MessageListener
   include MiniTest::Assertions
+  include Ramcrest::HasAttribute
 
   def initialize
     @messages = ArrayBlockingQueue.new(1)
@@ -25,11 +23,14 @@ class SingleMessageListener
 
   def receives_a_message(message_matcher)
     message = @messages.poll(5, TimeUnit::SECONDS)
-    Assert.assertThat(message, org.hamcrest.Matchers.hasProperty("body", message_matcher))
+    assert_that message, has_attribute(:body, message_matcher)
   end
 end
 
 class FakeAuctionServer
+  include MiniTest::Assertions
+  include Ramcrest::EqualTo
+
   ITEM_ID_AS_LOGIN = "auction-%s"
   AUCTION_RESOURCE = "Auction"
   XMPP_HOSTNAME = "localhost"
@@ -61,11 +62,11 @@ class FakeAuctionServer
   end
 
   def has_received_join_request_from(sniper_id)
-    receives_a_message_matching(sniper_id, Matchers.equalTo(XMPPAuction::JOIN_COMMAND_FORMAT))
+    receives_a_message_matching(sniper_id, equal_to(XMPPAuction::JOIN_COMMAND_FORMAT))
   end
 
   def has_received_bid(bid, sniper_id)
-    receives_a_message_matching(sniper_id, Matchers.equalTo(format(XMPPAuction::BID_COMMAND_FORMAT, bid)))
+    receives_a_message_matching(sniper_id, equal_to(format(XMPPAuction::BID_COMMAND_FORMAT, bid)))
   end
 
   def announce_closed
@@ -80,6 +81,6 @@ class FakeAuctionServer
 
   def receives_a_message_matching(sniper_id, message_matcher)
     @message_listener.receives_a_message(message_matcher)
-    Assert.assertThat(@current_chat.getParticipant, Matchers.equalTo(sniper_id));
+    assert_that(@current_chat.getParticipant, equal_to(sniper_id))
   end
 end

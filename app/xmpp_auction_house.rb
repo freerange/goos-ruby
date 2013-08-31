@@ -1,7 +1,11 @@
+require "logger"
+require "logging_xmpp_failure_reporter"
+
 class XMPPAuctionHouse
   AUCTION_RESOURCE = "Auction"
   ITEM_ID_AS_LOGIN = "auction-%s"
   AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE
+  LOG_FILE_NAME = "auction-sniper.log"
 
   def self.connect(hostname, username, password)
     connection = XMPPConnection.new(hostname)
@@ -12,10 +16,11 @@ class XMPPAuctionHouse
 
   def initialize(connection)
     @connection = connection
+    @failure_reporter = LoggingXMPPFailureReporter.new(Logger.new(LOG_FILE_NAME))
   end
 
   def auction_for(item)
-    XMPPAuction.new(@connection, auction_id(item.identifier, @connection))
+    XMPPAuction.new(@connection, auction_id(item.identifier, @connection), @failure_reporter)
   end
 
   def disconnect

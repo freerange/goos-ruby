@@ -1,13 +1,13 @@
 java_import org.junit.Assert
 
-class AuctionLogDriver
-  LOG_FILE_NAME = "auction-sniper.log"
+require "xmpp_auction_house"
 
+class AuctionLogDriver
   def has_entry(matcher)
-    Assert.assertThat(File.read(LOG_FILE_NAME), matcher)
+    Assert.assertThat(File.read(XMPPAuctionHouse::LOG_FILE_NAME), matcher)
   end
 
   def clear_log
-    File.open(LOG_FILE_NAME, "w") {}
+    File.open(XMPPAuctionHouse::LOG_FILE_NAME, "w") {}
   end
 end

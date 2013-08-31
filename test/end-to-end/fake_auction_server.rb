@@ -3,9 +3,6 @@ java_import org.jivesoftware.smack.ChatManagerListener
 java_import org.jivesoftware.smack.MessageListener
 java_import org.jivesoftware.smack.packet.Message
 
-java_import java.util.concurrent.ArrayBlockingQueue
-java_import java.util.concurrent.TimeUnit
-
 require "xmpp_auction"
 
 class SingleMessageListener
@@ -14,15 +11,15 @@ class SingleMessageListener
   include Ramcrest::HasAttribute
 
   def initialize
-    @messages = ArrayBlockingQueue.new(1)
+    @messages = Queue.new
   end
 
   def processMessage(chat, message)
-    @messages.add(message)
+    @messages.push(message)
   end
 
   def receives_a_message(message_matcher)
-    message = @messages.poll(5, TimeUnit::SECONDS)
+    message = @messages.pop
     assert_that message, has_attribute(:body, message_matcher)
   end
 end

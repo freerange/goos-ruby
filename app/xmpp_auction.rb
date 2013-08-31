@@ -5,8 +5,9 @@ class XMPPAuction
   JOIN_COMMAND_FORMAT = "SQLVersion: 1.1; Command: JOIN;"
   BID_COMMAND_FORMAT = "SQLVersion: 1.1; Command: BID; Price: %d;"
 
-  def initialize(connection, auction_id)
+  def initialize(connection, auction_id, failure_reporter)
     @auction_event_listeners = Announcer.new
+    @failure_reporter = failure_reporter
     translator = translator_for(connection)
     @chat = connection.getChatManager.createChat(auction_id, translator)
     add_auction_event_listener(chat_disconnector_for(translator))
@@ -33,7 +34,7 @@ class XMPPAuction
   end
 
   def translator_for(connection)
-    AuctionMessageTranslator.new(connection.getUser, @auction_event_listeners.announce)
+    AuctionMessageTranslator.new(connection.getUser, @auction_event_listeners.announce, @failure_reporter)
   end
 
   def chat_disconnector_for(translator)

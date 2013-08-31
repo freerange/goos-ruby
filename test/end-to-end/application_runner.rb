@@ -2,6 +2,7 @@ require "main"
 require "ui/snipers_table_model"
 require "end-to-end/fake_auction_server"
 require "end-to-end/auction_sniper_driver"
+require "end-to-end/auction_log_driver"
 
 class ApplicationRunner
   SNIPER_ID = "sniper"
@@ -9,6 +10,10 @@ class ApplicationRunner
   SNIPER_XMPP_ID = SNIPER_ID + "@" + FakeAuctionServer::XMPP_HOSTNAME + "/Auction"
 
   BIG_INTEGER = 100000000
+
+  def initialize
+    @log_driver = AuctionLogDriver.new
+  end
 
   def start_bidding_in(*auctions)
     start_sniper
@@ -45,6 +50,7 @@ class ApplicationRunner
   end
 
   def reports_invalid_message(auction, broken_message)
+    @log_driver.has_entry(org.hamcrest.Matchers.containsString(broken_message))
   end
 
   def stop
@@ -56,6 +62,7 @@ class ApplicationRunner
   private
 
   def start_sniper
+    @log_driver.clear_log
     thread = Thread.new do
       begin
         Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD)

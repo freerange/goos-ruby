@@ -57,14 +57,15 @@ class AuctionMessageTranslator
     end
   end
 
-  def initialize(sniper_id, listener)
-    @sniper_id, @listener = sniper_id, listener
+  def initialize(sniper_id, listener, failure_reporter)
+    @sniper_id, @listener, @failure_reporter = sniper_id, listener, failure_reporter
   end
 
   def processMessage(chat, message)
     message_body = message.getBody
     translate(message_body)
   rescue => parse_exception
+    @failure_reporter.cannot_translate_message(@sniper_id, message_body, parse_exception)
     @listener.auction_failed
   end
 

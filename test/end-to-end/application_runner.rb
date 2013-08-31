@@ -11,6 +11,8 @@ class ApplicationRunner
 
   BIG_INTEGER = 100000000
 
+  include Ramcrest::SuchThat
+
   def initialize
     @log_driver = AuctionLogDriver.new
   end
@@ -50,7 +52,7 @@ class ApplicationRunner
   end
 
   def reports_invalid_message(auction, broken_message)
-    @log_driver.has_entry(org.hamcrest.Matchers.containsString(broken_message))
+    @log_driver.has_entry(contains_string(broken_message))
   end
 
   def stop
@@ -80,5 +82,9 @@ class ApplicationRunner
     item_id = auction.item_id
     @driver.start_bidding_for(item_id, stop_price)
     @driver.shows_sniper_status(item_id, 0, 0, SnipersTableModel.text_for(SniperState::JOINING))
+  end
+
+  def contains_string(expected)
+    such_that { |actual| actual.include?(expected) ? success : mismatch("didn't contain '#{expected}'")}
   end
 end

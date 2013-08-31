@@ -1,13 +1,11 @@
 require "test_helper"
 
-java_import java.util.concurrent.CountDownLatch
-java_import java.util.concurrent.TimeUnit
-
 require "xmpp_auction_house"
 require "announcer"
 require "item"
 require "end-to-end/fake_auction_server"
 require "end-to-end/application_runner"
+require "countdownlatch"
 
 describe XMPPAuctionHouse do
   before do
@@ -28,7 +26,7 @@ describe XMPPAuctionHouse do
     auction.join
     @auction_server.has_received_join_request_from(ApplicationRunner::SNIPER_XMPP_ID)
     @auction_server.announce_closed
-    assert auction_was_closed.await(2, java.util.concurrent.TimeUnit::SECONDS), "should have been closed"
+    assert auction_was_closed.wait(2), "should have been closed"
   end
 
   private
@@ -40,7 +38,7 @@ describe XMPPAuctionHouse do
       end
 
       def auction_closed
-        @auction_was_closed.countDown
+        @auction_was_closed.countdown!
       end
 
       def current_price(price, increment, price_source)

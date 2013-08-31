@@ -1,7 +1,7 @@
 require "minitest/spec"
 require "minitest/autorun"
 
-require "mocha"
+require "mocha/setup"
 
 require "java"
 

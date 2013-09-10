@@ -7,16 +7,13 @@ class ApplicationRunner
   SNIPER_PASSWORD = "sniper"
 
   def start_bidding_in(auction)
-    thread = java.lang.Thread.new do
+    thread = Thread.new do
       begin
         Main.main(FakeAuctionServer::XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.item_id)
       rescue => e
         puts %{\n#{e}\n#{e.backtrace.join("\n")}}
       end
     end
-    thread.setName("Test Application")
-    thread.setDaemon(true)
-    thread.start
     @driver = AuctionSniperDriver.new(1000)
     @driver.shows_sniper_status(MainWindow::STATUS_JOINING)
   end

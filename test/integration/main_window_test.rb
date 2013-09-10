@@ -4,6 +4,7 @@ java_import com.objogate.wl.swing.probe.ValueMatcherProbe
 
 java_import org.hamcrest.Matchers
 
+require "item"
 require "ui/main_window"
 require "sniper_portfolio"
 require "end-to-end/auction_sniper_driver"

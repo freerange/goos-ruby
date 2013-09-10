@@ -15,17 +15,15 @@ describe SniperLauncher do
   it "adds new sniper to collector and then joins auction" do
     item = Item.new("item 123", 456)
     @auction_house.stubs(:auction_for).with(item).returns(@auction)
-    @auction.expects(:add_auction_event_listener).with(&sniper_for_item(item.identifier)).when(@auction_state.is("not joined"))
-    @sniper_collector.expects(:add_sniper).with(&sniper_for_item(item.identifier)).when(@auction_state.is("not joined"))
+    @auction.expects(:add_auction_event_listener).with(&sniper_for_item(item)).when(@auction_state.is("not joined"))
+    @sniper_collector.expects(:add_sniper).with(&sniper_for_item(item)).when(@auction_state.is("not joined"))
     @auction.stubs(:join).then(@auction_state.is("joined"))
     @launcher.join_auction(item)
   end
 
   private
 
-  def sniper_for_item(item_id)
-    lambda do |sniper|
-      sniper.snapshot.item_id == item_id
-    end
+  def sniper_for_item(item)
+    lambda { |sniper| sniper.snapshot.item_id == item.identifier }
   end
 end

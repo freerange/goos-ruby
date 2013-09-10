@@ -11,10 +11,11 @@ java_import javax.swing.event.TableModelEvent
 
 describe SnipersTableModel do
   before do
+    @item_id = "item 0"
     @listener = mock("TableModelListener")
     @model = SnipersTableModel.new
     @model.addTableModelListener(@listener)
-    @sniper = AuctionSniper.new(Item.new("item 0", 234), nil)
+    @sniper = AuctionSniper.new(Item.new(@item_id, 234), nil)
   end
 
   it "has enough columns" do
@@ -32,7 +33,7 @@ describe SnipersTableModel do
     assert_equal 0, @model.getRowCount
     @model.sniper_added(@sniper)
     assert_equal 1, @model.getRowCount
-    assert_row_matches_snapshot(0, SniperSnapshot.joining("item 0"))
+    assert_row_matches_snapshot(0, SniperSnapshot.joining(@item_id))
   end
 
   it "holds snipers in addition order" do
@@ -40,7 +41,7 @@ describe SnipersTableModel do
     @listener.stubs(:tableChanged)
     @model.sniper_added(@sniper)
     @model.sniper_added(sniper2)
-    assert_equal "item 0", cell_value(0, Column::ITEM_IDENTIFIER)
+    assert_equal @item_id, cell_value(0, Column::ITEM_IDENTIFIER)
     assert_equal "item 1", cell_value(1, Column::ITEM_IDENTIFIER)
   end
 

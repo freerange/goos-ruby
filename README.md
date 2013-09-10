@@ -1,13 +1,13 @@
-## Gosling
+## GOOS Ruby
 
-Attempt at translating GOOS book worked example into Ruby.
+This repository contains a history of me working through the example in the [GOOS book](http://www.growing-object-oriented-software.com/) using Ruby instead of Java.
 
 ### Prerequisites
 
 - JRuby (tested with v1.6.7 installed via `rbenv`)
 - [Openfire](http://www.igniterealtime.org/projects/openfire/) (tested with v3.7.1)
 - Bundler (tested with v1.1.4)
-- All only tested on Mac OSX v10.7.4
+- All only tested on Mac OSX v10.8.4
 
 ### Openfire XMPP server
 
